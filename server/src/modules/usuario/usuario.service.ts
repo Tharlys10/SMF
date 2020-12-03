@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from '../../shared/entities';
 import { Repository } from 'typeorm';
-import { CreateUsuarioDto } from 'src/shared/dtos/usuario.dto';
+import { CreateUsuarioDto } from 'src/shared/dtos';
 
 @Injectable()
 export class UsuarioService {

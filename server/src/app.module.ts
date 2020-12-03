@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsuarioModule } from './modules/usuario/usuario.module';
+import { MensagemModule } from './modules/mensagem/mensagem.module';
+import { ConversaModule } from './modules/conversa/conversa.module';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { UsuarioModule } from './modules/usuario/usuario.module';
       logging: ['error', 'warn']
     }),
     AuthModule,
-    UsuarioModule
+    UsuarioModule,
+    MensagemModule,
+    ConversaModule
   ],
   controllers: [],
   providers: [],

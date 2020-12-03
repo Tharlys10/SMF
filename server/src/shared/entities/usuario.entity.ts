@@ -21,6 +21,9 @@ export class Usuario {
   @Column()
   senha: string
 
+  @Column({ type: 'boolean', default: false })
+  master: boolean
+
   @CreateDateColumn()
   criado_em: Date
 

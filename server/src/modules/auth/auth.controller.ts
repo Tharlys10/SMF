@@ -1,14 +1,12 @@
 import {
   BadRequestException,
-  InternalServerErrorException,
-  ConflictException,
   Controller,
   Post,
   Body
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Token } from 'src/shared/@types';
-import { LoginDto } from 'src/shared/dtos/auth.dto';
+import { LoginDto } from 'src/shared/dtos';
 import { Usuario } from 'src/shared/entities';
 import { encrypt } from 'src/shared/functions/cript';
 import { UsuarioService } from '../usuario/usuario.service';

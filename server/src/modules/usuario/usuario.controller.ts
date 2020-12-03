@@ -1,7 +1,7 @@
 import { BadRequestException, Body, ConflictException, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { CreateUsuarioDto } from 'src/shared/dtos/usuario.dto';
+import { CreateUsuarioDto } from 'src/shared/dtos';
 import { Usuario } from 'src/shared/entities';
-import { decrypt } from 'src/shared/functions';
+import { decrypt, encrypt } from 'src/shared/functions';
 import { DefaultAuthGuard } from 'src/shared/guards';
 import { UsuarioService } from './usuario.service';
 
@@ -22,7 +22,9 @@ export class UsuarioController {
 
     const usuarioCriado = await this.usuarioService.create(usuario)
 
-    return { id: usuarioCriado.id }
+    const idEncrypted = encrypt(usuarioCriado.id)
+
+    return { id: idEncrypted }
   }
 
   @Get(':id')
