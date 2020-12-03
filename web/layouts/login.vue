@@ -1,7 +1,5 @@
 <template>
   <v-app>
-    <AppBar />
-    <NavigationDrawer />
     <v-main>
       <v-container fluid>
         <nuxt />  
