@@ -5,34 +5,83 @@
         <div
           class="title-card title-card-left"
         >
-          CONVERSAS
+          <v-btn
+           dark 
+           icon
+           @click="openModalNewConversa = true"
+          >
+            <v-icon>mdi-message-plus-outline</v-icon>
+          </v-btn>
+          <span>CONVERSAS</span>
         </div>
         <div class="card-conversas">
-          <v-list v-for="n in 10" :key="n">
-            <v-list-item>
+          <v-list>
+            <v-list-item  
+              :class="idConversa === item.conversa_id ? 'grey lighten-1' : null"
+              @click="
+                key++,
+                idConversa = item.conversa_id, 
+                idDestinatario = item.conversa_id_usuario_primario === $store.getters.tokenData.id ? item.conversa_id_usuario_secundario : item.conversa_id_usuario_primario, 
+                userConversa = item.usuario_s_nome, 
+                assuntoConversa = item.conversa_assunto" 
+              v-for="item in conversas" 
+              :key="item.conversa_id"
+            >
               <v-list-item-avatar>
-                <img src="https://randomuser.me/api/portraits/women/81.jpg">
+                <v-avatar color="#080912">
+                  <v-icon dark>
+                    mdi-account-circle
+                  </v-icon>
+                </v-avatar>
+                <!-- <img src="https://randomuser.me/api/portraits/women/81.jpg"> -->
               </v-list-item-avatar>
 
               <v-list-item-content>
-                <v-list-item-title>Jane Smith</v-list-item-title>
-                <v-list-item-subtitle>Logged In</v-list-item-subtitle>
+                <v-list-item-title>{{ item.usuario_s_nome }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item.conversa_assunto }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
         </div>
       </v-col>
       <v-col class="ma-0 pa-0" cols="9" xs="9">
-        <div
-          class="title-card title-card-right"
-        >
-          THARLYS ALVES
+        <div v-if="idConversa">
+          <div
+            class="title-card title-card-right pa-4"
+          >
+            {{ userConversa }} <span style="font-size: 10px;">({{ assuntoConversa }})</span>
+          </div>
+          <div class="card-conversas" id="messages">
+            <MessageViewer
+              :key="key"
+              :idConversa="idConversa"
+              :idDestinatario="idDestinatario"
+            />
+          </div>
         </div>
-        <div class="card-conversas" id="messages">
-          <MessageViewer />
+        <div v-else>
+          <div
+            class="title-card title-card-right pa-4"
+          >
+            <span>Selecione uma conversa para vizualiza o conteúdo</span>
+          </div>
+          <div class="card-conversas">
+            <DefaultMessageViewer/>
+          </div>
         </div>
       </v-col>
     </v-row>
+    <v-dialog
+      v-model="openModalNewConversa"
+      v-if="openModalNewConversa"
+      persistent
+      max-width="600px"
+    >
+      <NewConversa 
+        v-if="openModalNewConversa" 
+        v-on:commit-close="openModalNewConversa = false; getMinhasConversas()"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -42,16 +91,36 @@ import { LoginDto } from '~/@types'
 
 @Component({})
 export default class HomePage extends Vue {
-  tab = 0
+  openModalNewConversa: boolean = false;
+  conversas: Array<any> = []
 
-  mounted(){
-    this.scrollMessage()
+  idConversa: string | null = null
+  idDestinatario: string | null = null
+  userConversa: string | null = null
+  assuntoConversa: string | null = null
+
+  key: number = 0
+
+  created(){
+    this.getMinhasConversas()
   }
 
   scrollMessage(){
     var objDiv: any = window.document.getElementById("messages");
-
+    
     objDiv.scrollTop = objDiv.scrollHeight;
+  }
+
+  getMinhasConversas(){
+    this.$store.dispatch('conversa/getConversaCurrent')
+      .then(res => {
+        this.conversas = res.data;
+      })
+      .catch(err => {
+        console.log(err.response.data.message);
+      })
+      .finally(() => {
+      })
   }
 }
 </script>

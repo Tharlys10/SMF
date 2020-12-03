@@ -5,7 +5,7 @@
     <v-card>
       <v-card-title>
         <v-text-field
-          v-model="search"
+          v-model="params.busca"
           append-icon="mdi-magnify"
           outlined
           label="Pesquisar"
@@ -26,11 +26,25 @@
       <v-data-table
         :headers="headers"
         :items="items"
+        :items-per-page.sync="params.limit"
+        :page.sync="params.page"
+        :loading="isLoadingTable"
+        :server-items-length="count"
+        :calculate-widths="true"
+        :footer-props="{itemsPerPageOptions: [5,10,20,40]}"
+        loading-text="Buscando usuários..."
+        no-data-text="Nenhum usuário encontrado!"
       >
-        <template v-slot:item.actions="{  }">
+        <template v-slot:item.contato_celular="{ item }">
+          <div>
+            {{ item.contato_celular.replace(/(\d{2})(\d{5})(\d{4})/, "($1)$2-$3")}}
+          </div>
+        </template>
+
+        <template v-slot:item.actions="{ item }">
           <v-btn
             icon
-            @click="null"
+            @click="dadosModalUpdateUSer = item, openModalUpdateUser = true"
           >
             <v-icon color="primary">
               mdi-pencil
@@ -48,45 +62,73 @@
     >
       <UserNew 
         v-if="openModalNewUser" 
-        v-on:commit-close="openModalNewUser = false"
+        v-on:commit-close="openModalNewUser = false; getListaUsuarios()"
+      />
+    </v-dialog>
+
+    <v-dialog
+      v-model="openModalUpdateUser"
+      v-if="openModalUpdateUser"
+      persistent
+      max-width="600px"
+    >
+      <UserEdit
+        v-if="openModalUpdateUser" 
+        :idUser="dadosModalUpdateUSer.id"
+        :nomeUser="dadosModalUpdateUSer.nome"
+        :emailUser="dadosModalUpdateUSer.email"
+        :contatoNomeUser="dadosModalUpdateUSer.contato_nome"
+        :contatoTelefoneUser="dadosModalUpdateUSer.contato_celular"
+        v-on:commit-close="openModalUpdateUser = false; getListaUsuarios()"
       />
     </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Component, Watch, Vue } from 'nuxt-property-decorator'
 
 @Component
 export default class UserListComponent extends Vue {
   openModalNewUser: boolean = false;
+  openModalUpdateUser: boolean = false;
+  dadosModalUpdateUSer: Array<any> = [];
 
-  search: string =  '';
+  count: number = 0
+
+  params = {
+    limit: 10,
+    page: 1,
+    busca: ''
+  }
+
+  timeout: any = null
+  isLoadingTable: boolean = true
 
   headers = [
     {
       text: 'Nome',
       align: 'start',
       sortable: false,
-      value: 'name',
+      value: 'nome',
     },
     { 
       text: 'E-mail', 
       align: 'start',
       sortable: false,
-      value: 'calories' 
+      value: 'email' 
     },
     { 
       text: 'Contato nome',
       align: 'start',
       sortable: false, 
-      value: 'fat' 
+      value: 'contato_nome' 
     },
     { 
       text: 'Contato celular', 
       align: 'start',
       sortable: false,
-      value: 'carbs' 
+      value: 'contato_celular' 
     },
     {
       text: 'Ações', 
@@ -95,88 +137,50 @@ export default class UserListComponent extends Vue {
     }
   ];
 
-  items = [
-    {
-      name: 'Frozen Yogurt',
-      calories: 159,
-      fat: 6.0,
-      carbs: 24,
-      protein: 4.0,
-      iron: '1%',
-    },
-    {
-      name: 'Ice cream sandwich',
-      calories: 237,
-      fat: 9.0,
-      carbs: 37,
-      protein: 4.3,
-      iron: '1%',
-    },
-    {
-      name: 'Eclair',
-      calories: 262,
-      fat: 16.0,
-      carbs: 23,
-      protein: 6.0,
-      iron: '7%',
-    },
-    {
-      name: 'Cupcake',
-      calories: 305,
-      fat: 3.7,
-      carbs: 67,
-      protein: 4.3,
-      iron: '8%',
-    },
-    {
-      name: 'Gingerbread',
-      calories: 356,
-      fat: 16.0,
-      carbs: 49,
-      protein: 3.9,
-      iron: '16%',
-    },
-    {
-      name: 'Jelly bean',
-      calories: 375,
-      fat: 0.0,
-      carbs: 94,
-      protein: 0.0,
-      iron: '0%',
-    },
-    {
-      name: 'Lollipop',
-      calories: 392,
-      fat: 0.2,
-      carbs: 98,
-      protein: 0,
-      iron: '2%',
-    },
-    {
-      name: 'Honeycomb',
-      calories: 408,
-      fat: 3.2,
-      carbs: 87,
-      protein: 6.5,
-      iron: '45%',
-    },
-    {
-      name: 'Donut',
-      calories: 452,
-      fat: 25.0,
-      carbs: 51,
-      protein: 4.9,
-      iron: '22%',
-    },
-    {
-      name: 'KitKat',
-      calories: 518,
-      fat: 26.0,
-      carbs: 65,
-      protein: 7,
-      iron: '6%',
-    },
-  ]
+  items: Array<any> = []
+
+  // Atualizar a tabela pelas mudanças dos filtros
+  @Watch("params.limit")
+  onPageChanged(_page: number) {
+    this.getListaUsuarios();
+  }
+
+  @Watch("params.amount")
+  onAmountChanged(_amount: number) {
+    this.getListaUsuarios();
+  }
+
+  @Watch("params.busca")
+  onSearchChanged(_search: string) {
+    clearTimeout(this.timeout);
+
+    this.isLoadingTable = true
+
+    this.timeout = setTimeout(() => {
+      this.params.page = 1
+
+      this.getListaUsuarios();
+    }, 500);
+  }
+
+
+  created(){
+    this.getListaUsuarios()
+  }
+
+  getListaUsuarios(){
+    this.$store.dispatch('usuario/getListUsers', this.params)
+      .then(res => {
+        console.log(res.data);
+        this.count = res.data.total
+        this.items = res.data.data
+      })
+      .catch(err => {
+        this.isLoadingTable = false
+        console.log(err.response.data.message);
+      })
+      .finally(() => this.isLoadingTable = false)
+  }
 
 }
 </script>

@@ -19,9 +19,9 @@
         <v-list-item link>
           <v-list-item-content>
             <v-list-item-title class="title">
-              Sandra Adams
+              {{ $store.state.userName }}
             </v-list-item-title>
-            <v-list-item-subtitle>sandra_a88@gmail.com</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ $store.state.userMail }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>

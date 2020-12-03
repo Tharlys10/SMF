@@ -1,10 +1,10 @@
 <template>
   <v-card>
     <v-card-title>
-      <span class="headline">Novo usuário</span>
+      <span class="headline">Editar usuário</span>
     </v-card-title>
     <v-card-text>
-      <v-form v-model="validFormNewUser">
+      <v-form v-model="validFormUpdateUser">
         <v-text-field
           v-model="nome"
           label="* Nome"
@@ -52,21 +52,6 @@
           ]"
           prepend-inner-icon="mdi-cellphone-basic"
         />
-        <v-text-field
-          v-model="senha"
-          label="* Senha"
-          color="#000"
-          outlined
-          dense
-          :rules="[
-            v => !!v || 'Senha é obrigatória',
-            v => (!!v && v.length >= 8) || 'Min. 8 caracteres'
-          ]"
-          prepend-inner-icon="mdi-lock"
-          :append-icon="obscuredSenha ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="!obscuredSenha ? 'text' : 'password'"
-          @click:append="obscuredSenha = !obscuredSenha"
-        />
       </v-form>
     </v-card-text>
     <v-card-actions>
@@ -81,8 +66,8 @@
       <v-btn
         color="success darken-1"
         text
-        :disabled="!validFormNewUser"
-        @click="sendCreateUser"
+        :disabled="!validFormUpdateUser"
+        @click="sendUpdateUser"
       >
         Salvar
       </v-btn>
@@ -91,8 +76,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
-import { CreateUsuarioDto } from '~/@types'
+import { Component, Prop, Vue } from 'nuxt-property-decorator'
+import { UpdateUsuarioDto } from '~/@types'
 import { mask } from 'vue-the-mask'
 
 @Component({
@@ -101,27 +86,47 @@ import { mask } from 'vue-the-mask'
   }
 })
 export default class UserNewComponent extends Vue {
+  @Prop({type: String, required: true})
+  idUser!: string
+
+  @Prop({type: String, required: true})
+  nomeUser!: string
+
+  @Prop({type: String, required: true})
+  emailUser!: string
+
+  @Prop({type: String, required: true})
+  contatoNomeUser!: string
+
+  @Prop({type: String, required: true})
+  contatoTelefoneUser!: string
+
   emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|\\[\x01-\x09\x0B\x0C\x0E-\x7F])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21-\x5A\x53-\x7F]|\\[\x01-\x09\x0B\x0C\x0E-\x7F])+)\])/
 
-  validFormNewUser: boolean = false
+  validFormUpdateUser: boolean = false
   obscuredSenha: boolean = true
 
   nome: string = ''
   email: string = ''
   contatoNome: string = ''
   contatoTelefone: string = ''
-  senha: string = ''
 
-  sendCreateUser(){
-    let payload: CreateUsuarioDto = {
+  created(){
+    this.nome = this.nomeUser
+    this.email = this.emailUser
+    this.contatoNome = this.contatoNomeUser
+    this.contatoTelefone = this.contatoTelefoneUser
+  }
+
+  sendUpdateUser(){
+    let payload: UpdateUsuarioDto = {
       nome: this.nome,
       email: this.email,
       contato_nome: this.contatoNome,
-      contato_celular: this.contatoTelefone.replace(/\D/g, ''),
-      senha: this.senha
+      contato_celular: this.contatoTelefone.replace(/\D/g, '')
     }
 
-    this.$store.dispatch('usuario/create', payload)
+    this.$store.dispatch('usuario/update', { payload, id: this.idUser })
       .then(res => {
         console.log(res.data);
         this.commitClose();
