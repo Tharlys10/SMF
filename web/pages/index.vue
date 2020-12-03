@@ -1,89 +1,102 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div>
+    <v-row class="ma-1">
+      <v-col class="ma-0 pa-0" cols="3" xs="3">
+        <div
+          class="title-card title-card-left"
+        >
+          CONVERSAS
+        </div>
+        <div class="card-conversas">
+          <v-list v-for="n in 10" :key="n">
+            <v-list-item>
+              <v-list-item-avatar>
+                <img src="https://randomuser.me/api/portraits/women/81.jpg">
+              </v-list-item-avatar>
+
+              <v-list-item-content>
+                <v-list-item-title>Jane Smith</v-list-item-title>
+                <v-list-item-subtitle>Logged In</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </div>
+      </v-col>
+      <v-col class="ma-0 pa-0" cols="9" xs="9">
+        <div
+          class="title-card title-card-right"
+        >
+          THARLYS ALVES
+        </div>
+        <div class="card-conversas" id="messages">
+          <MessageViewer />
+        </div>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
-<script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+<script lang="ts">
+import { Component, Vue } from 'nuxt-property-decorator'
+import { LoginDto } from '~/@types'
 
-export default {
-  components: {
-    Logo,
-    VuetifyLogo
+@Component({})
+export default class HomePage extends Vue {
+  tab = 0
+
+  mounted(){
+    this.scrollMessage()
+  }
+
+  scrollMessage(){
+    var objDiv: any = window.document.getElementById("messages");
+
+    objDiv.scrollTop = objDiv.scrollHeight;
   }
 }
 </script>
+
+<style>
+  .card-conversas {
+    height: 75vh;
+    overflow-y: auto;
+  }
+
+  /* width */
+  .card-conversas::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  /* Track */
+  .card-conversas::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  .card-conversas::-webkit-scrollbar-thumb {
+    background: #EFB810; 
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  .card-conversas::-webkit-scrollbar-thumb:hover {
+    background: #D9AD26; 
+  }
+
+  .title-card{
+    color: #FFF; 
+    background-color: #080912; 
+    padding: 10px;
+  }
+
+  .title-card-left{
+    border-top-left-radius: 7px;
+    /* border-bottom-left-radius: 7px; */
+  }
+
+  .title-card-right{
+    border-top-right-radius: 7px;
+    /* border-bottom-right-radius: 7px; */
+  }
+</style>

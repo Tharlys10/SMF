@@ -15,6 +15,18 @@ export default {
     ]
   },
 
+  server: {
+    port: 3001,
+    host: '0.0.0.0', // default: localhost
+  },
+
+  router: {
+    base:
+      process.env.NODE_ENV === 'production'
+        ? process.env.BASE_URL || 'http://localhos:8080'
+        : '/',
+  },
+
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
   ],
@@ -37,17 +49,21 @@ export default {
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    'cookie-universal-nuxt',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://192.168.0.129:4000',
+    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://192.168.0.129:4000',
+  },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken2,
@@ -61,6 +77,8 @@ export default {
       }
     }
   },
+
+  
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
