@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/shared/decorators';
 import { CreateMensagemDto, CreateMensagemEConversaDto } from 'src/shared/dtos';
 import { Mensagem, Usuario } from 'src/shared/entities';
@@ -7,6 +7,7 @@ import { MensagemService } from './mensagem.service';
 import { ConversaService } from '../conversa/conversa.service';
 import { UsuarioService } from '../usuario/usuario.service';
 import { Pagination } from 'src/shared/@types';
+import { decrypt, encrypt } from 'src/shared/functions';
 
 @Controller('mensagem')
 export class MensagemController {
@@ -21,12 +22,12 @@ export class MensagemController {
   async createMensagem(
     @CurrentUser() currentUser: Usuario,
     @Body() mensagem: CreateMensagemDto
-  ): Promise<{ id: string }> {
+  ): Promise<any> {
     mensagem.id_remetente = currentUser.id
 
     const mensagemCriada = await this.mensagemService.create(mensagem)
 
-    return { id: mensagemCriada.id }
+    return mensagemCriada
   }
 
   @Post('conversa')
@@ -34,50 +35,101 @@ export class MensagemController {
   async createMensagemEConversa(
     @CurrentUser() currentUser: Usuario,
     @Body() mensagem: CreateMensagemEConversaDto
-  ): Promise<{ id: string }> {
-    let conversaCriada: string
+  ): Promise<{ ids: string[] }> {
+    let conversasCriadas: string[] = []
+    let mensagensCriadas: string[] = []
     mensagem.id_remetente = currentUser.id
 
+    mensagem.id_destinatario = mensagem.id_destinatario.map(id => decrypt(id))
+
     if (!currentUser.master) {
-      const usuario = await this.usuarioService.indexByID(mensagem.id_destinatario)
-      if (!usuario.master) {
+      const usuarios = await this.usuarioService.indexByIDs(mensagem.id_destinatario)
+
+      const allNotMaster = usuarios.every(usr => !usr.master)
+      if (allNotMaster) {
         throw new UnauthorizedException('Não é permitido criar esse tipo de conversa')
       }
     }
 
-    // verificar se existe alguma conversa com os usuários passados
-    const existeConversa = await this.conversaService.indexByUsuarios({
-      id_usuario_primario: mensagem.id_remetente,
-      id_usuario_secundario: mensagem.id_destinatario
-    })
+    for (let i = 0; i < mensagem.id_destinatario.length; i++) {
+      const dstn = mensagem.id_destinatario[i];
 
-    if (!existeConversa) {
-      const { id } = await this.conversaService.create({
-        id_usuario_primario: mensagem.id_remetente,
-        id_usuario_secundario: mensagem.id_destinatario,
-        assunto: mensagem.assunto
+      // verificar se existe alguma conversa com os usuários passados
+      // const existeConversa = await this.conversaService.indexByUsuarios({
+      //   id_usuario_primario: mensagem.id_remetente,
+      //   id_usuario_secundario: dstn
+      // })
+
+      // if (!existeConversa) {
+        const conversaCriada = await this.conversaService.create({
+          id_usuario_primario: mensagem.id_remetente,
+          id_usuario_secundario: dstn,
+          assunto: mensagem.assunto
+        })
+
+        conversasCriadas.push(conversaCriada.id)
+      // } else {
+      //   conversasCriadas.push(existeConversa.id)
+      // }
+
+      let mensagemCriada = await this.mensagemService.create({
+        id_conversa: conversasCriadas[i],
+        id_remetente: mensagem.id_remetente,
+        texto: mensagem.texto,
+        valor: mensagem.valor,
+        anexo: mensagem.anexo
       })
 
-      conversaCriada = id
+      mensagensCriadas.push(mensagemCriada.id)
     }
 
-    const mensagemCriada = await this.mensagemService.create({
-      id_conversa: conversaCriada,
-      id_remetente: mensagem.id_remetente,
-      texto: mensagem.texto,
-      valor: mensagem.valor,
-      anexo: mensagem.anexo
-    })
+    return { ids: mensagensCriadas }
+  }
 
-    return { id: mensagemCriada.id }
+  @Put(':id/anexo/visualizar')
+  @UseGuards(DefaultAuthGuard)
+  async visualizeAnexoByConversa(
+    @Param('id') id: string
+  ): Promise<Mensagem> {
+    const mensagem = await this.mensagemService.visualizeAnexoByMensagem(id)
+
+    mensagem.id_remetente = encrypt(mensagem.id_remetente)
+
+    return mensagem
   }
 
   @Get('conversa/:id')
-  // @UseGuards(DefaultAuthGuard)
+  @UseGuards(DefaultAuthGuard)
   async listByConversa(
     @Param('id') id: string,
-    @Query() pagination: Pagination
+    @Query() pagination: Pagination,
+    @CurrentUser() currentUser: Usuario
   ): Promise<Mensagem[]> {
-    return await this.mensagemService.listByConversa(id, pagination)
+    await this.mensagemService.view(currentUser.id, id)
+
+    const mensagens = await this.mensagemService.listByConversa(currentUser.id, id, pagination)
+
+    mensagens.forEach(msg => {
+      msg.id_remetente = encrypt(msg.id_remetente)
+    })
+
+    return mensagens
+  }
+
+  @Get(':id')
+  @UseGuards(DefaultAuthGuard)
+  async index(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: Usuario
+  ): Promise<{ id: string, anexo: string, ext: string, atualizado: boolean }> {
+    return await this.mensagemService.indexWithAnexo(id, currentUser.id)
+  }
+
+  @Put('conversa/:id/visualizar')
+  @UseGuards(DefaultAuthGuard)
+  async visualizeByConversa(
+    @Param('id') id: string
+  ): Promise<boolean> {
+    return await this.mensagemService.visualizeAllByConversa(id)
   }
 }
