@@ -14,6 +14,9 @@ export class Mensagem {
   @Column({ type: 'bytea', nullable: true })
   anexo?: Buffer
 
+  @Column({ type: 'character varying', length: 10, nullable: true })
+  ext?: string
+
   @Column({ type: 'text' })
   texto: string
 

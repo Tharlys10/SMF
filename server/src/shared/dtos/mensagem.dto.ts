@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator"
+import { IsArray, IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator"
 
 export class CreateMensagemDto {
   @IsNotEmpty()
@@ -25,6 +25,8 @@ export class CreateMensagemEConversaDto {
 
   anexo?: string
 
+  ext?: string
+
   @IsNotEmpty()
   @IsString()
   texto: string
@@ -35,8 +37,8 @@ export class CreateMensagemEConversaDto {
 
   // campos relacionados a conversa
   @IsNotEmpty()
-  @IsUUID()
-  id_destinatario: string
+  @IsArray()
+  id_destinatario: string[]
 
   @IsNotEmpty()
   @IsString()

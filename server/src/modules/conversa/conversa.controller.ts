@@ -6,6 +6,7 @@ import { Conversa } from 'src/shared/entities/conversa.entity';
 import { DefaultAuthGuard } from 'src/shared/guards';
 import { UsuarioService } from '../usuario/usuario.service';
 import { ConversaService } from './conversa.service';
+import { decrypt, encrypt } from '../../shared/functions'
 
 @Controller('conversa')
 export class ConversaController {
@@ -34,11 +35,27 @@ export class ConversaController {
     return { id: conversaCriada.id }
   }
 
+  @Get('usuario/current')
+  @UseGuards(DefaultAuthGuard)
+  async listConversasByCurrentUser(
+    @CurrentUser() currentUser: Usuario
+  ): Promise<any[]> {
+    const conversas = await this.conversaService.listByUsuario(currentUser.id)
+
+    conversas.forEach(cnv => {
+      cnv.conversa_id_usuario_primario = encrypt(cnv.conversa_id_usuario_primario)
+      cnv.conversa_id_usuario_secundario = encrypt(cnv.conversa_id_usuario_secundario)
+    })
+
+    return conversas
+  }
+
   @Get('usuario/:id')
   @UseGuards(DefaultAuthGuard)
   async listConversasByUser(
     @Param('id') id_usuario: string
-  ): Promise<Conversa[]> {
-    return await this.conversaService.listByUsuario(id_usuario)
+  ): Promise<any[]> {
+    const idDecrypted = decrypt(id_usuario)
+    return await this.conversaService.listByUsuario(idDecrypted)
   }
 }

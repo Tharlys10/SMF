@@ -21,3 +21,16 @@ export class CreateUsuarioDto {
   @IsString()
   senha: string
 }
+
+export class UpdateUsuarioDto {
+  nome?: string
+  email?: string
+  contato_nome?: string
+  contato_celular?: string
+}
+
+export class FilterUsuarios {
+  page?: number
+  limit?: number
+  busca?: string
+}
