@@ -1,9 +1,12 @@
 import { MutationTree, GetterTree, ActionTree } from 'vuex'
 import { Context } from '@nuxt/types'
-import { LoginDto } from '@/@types'
+import { LoginDto } from '~/@types'
 
 export const state = () => ({
   token: '',
+  userName: '',
+  userMail: '',
+  userAcessoMaster: false 
 })
 
 export type RootState = ReturnType<typeof state>
@@ -11,6 +14,14 @@ export type RootState = ReturnType<typeof state>
 export const mutations: MutationTree<RootState> = {
   set_token: (state, token: string) => {
     state.token = token
+  },
+  set_user: (state, 
+    {userName, userMail, userAcessoMaster}: 
+    { userName: string, userMail: string, userAcessoMaster: boolean }  
+    ) => {
+    state.userName = userName
+    state.userMail = userMail
+    state.userAcessoMaster = userAcessoMaster
   },
 }
 
@@ -63,14 +74,41 @@ export const getters: GetterTree<RootState, RootState> = {
 }
 
 export const actions: ActionTree<RootState, RootState> = {
-  async nuxtServerInit({ commit }, context: Context) {
-    const token = context.app.$cookies.get('token')
-
+  async nuxtServerInit({ commit, dispatch }, context: Context) {
+    const token = context.app.$cookies.get('token-fom')
+    
     if (!token) {
       return
     }
 
     commit('set_token', token)
+    
+    try {
+      await dispatch('getUserCurrent');
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async getUserCurrent({ rootState, commit } ) {
+    return new Promise((resolve, reject) => {
+      this.$axios({
+        url: `/usuario/current`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${rootState.token}`,
+        },
+      }).then(res => {
+
+        const { nome, email, master } = res.data
+          
+        commit('set_user', { userName: nome, userMail: email, userAcessoMaster: master }) 
+
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
   },
 
   async sendLogin({ commit }, payload: LoginDto ) {

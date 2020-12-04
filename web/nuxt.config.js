@@ -51,12 +51,19 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     'cookie-universal-nuxt',
+    '@nuxtjs/moment',
   ],
+
+  moment: {
+    defaultLocale: 'pt',
+    locales: ['pt'],
+    timezone: true
+  },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://192.168.0.129:4000',
-    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://192.168.0.129:4000',
+    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://100.79.153.35:4000',
+    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://100.79.153.35:4000',
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)

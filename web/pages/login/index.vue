@@ -24,7 +24,7 @@
           color="#000"
           :rules="[
             v => !!v || 'Senha é obrigatória',
-            v => (!!v && v.length > 8) || 'Min. 8 caracteres'
+            v => (!!v && v.length >= 8) || 'Min. 8 caracteres'
           ]"
           prepend-inner-icon="mdi-lock"
           :append-icon="obscuredSenha ? 'mdi-eye' : 'mdi-eye-off'"

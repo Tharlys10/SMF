@@ -1,32 +1,47 @@
 import { ActionTree } from 'vuex'
 import { RootState } from '@/store/index.ts'
-import { CreateUsuarioDto, UpdateUsuarioDto } from '~/@types'
+import { CreateMensagemDto, CreateMensagemEConversaDto } from '@/@types'
 
 
 export const actions: ActionTree<any, RootState> = {
-  async create({ rootState }, payload: CreateUsuarioDto ) {
+  async getMensagemByID({ rootState }, id: string) {
     return new Promise((resolve, reject) => {
       this.$axios({
-        url: `/usuario`,
-        data: payload,
+        url: `/mensagem/${id}`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${rootState.token}`,
+        },
+      }).then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  },
+  
+  async getMensagensByIDConversa({ rootState }, id: string) {
+    return new Promise((resolve, reject) => {
+      this.$axios({
+        url: `/mensagem/conversa/${id}`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${rootState.token}`,
+        },
+      }).then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  },
+
+  async create({ rootState }, payload: CreateMensagemDto) {
+    return new Promise((resolve, reject) => {
+      this.$axios({
+        url: `/mensagem`,
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${rootState.token}`,
-        },
-      }).then(res => {
-        resolve(res)
-      }).catch(err => {
-        reject(err)
-      })
-    })
-  },
-
-  async update({ rootState }, { payload, id}: { payload: UpdateUsuarioDto, id: string }) {
-    return new Promise((resolve, reject) => {
-      this.$axios({
-        url: `/usuario/${id}`,
         data: payload,
-        method: 'PUT',
         headers: {
           Authorization: `Bearer ${rootState.token}`,
         },
@@ -38,29 +53,12 @@ export const actions: ActionTree<any, RootState> = {
     })
   },
 
-  async getListUsers({ rootState }, params ) {
+  async createMensagemEConverso({ rootState }, payload: CreateMensagemEConversaDto) {
     return new Promise((resolve, reject) => {
       this.$axios({
-        url: `/usuario/list`,
-        method: 'GET',
-        params,
-        headers: {
-          Authorization: `Bearer ${rootState.token}`,
-        },
-      }).then(res => {
-        resolve(res)
-      }).catch(err => {
-        reject(err)
-      })
-    })
-  },
-
-  async getUsuariosByName({ rootState }, params ) {
-    return new Promise((resolve, reject) => {
-      this.$axios({
-        url: `/usuario/list/conversa/new`,
-        method: 'GET',
-        params,
+        url: `/mensagem/conversa`,
+        method: 'POST',
+        data: payload,
         headers: {
           Authorization: `Bearer ${rootState.token}`,
         },

@@ -1,26 +1,53 @@
 <template>
   <div>
     <div class="messages">
-      <div class="container-chat" v-for="n in 100" :key="n">
-        <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Avatar">
-        <p>Hello. How are you today?</p>
-        <v-btn 
-          v-if="anexo"
-          color="success"
-          outlined 
-          dark
-          small
-        >
-          <v-icon left>{{ getIcon(null) }}</v-icon> Anexo <v-icon right>mdi-cloud-download-outline</v-icon>
-        </v-btn>
-        <span class="time-right">11:00 <v-icon right>{{ getIcon('2020-12-02T00:00:00') }}</v-icon></span>
-      </div>
+      <div v-for="(item, index) in mensagens" :key="item.id">
+        <div  v-if="!item.e_remetente" class="container-chat darker">
+          <!-- <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Avatar" class="right"> -->
+          <v-avatar id="avatar" color="#080912">
+            <v-icon dark>
+              mdi-account-circle
+            </v-icon>
+          </v-avatar>
+          <p>{{ item.texto }}</p>
+          <v-btn 
+            v-if="item.tem_anexo"
+            class="mb-2"
+            color="success"
+            outlined 
+            dark
+            small
+            @click="downloadAttachment(item.id, index)"
+          >
+            <v-icon left>{{ getIcon(item.data_anexo) }}</v-icon> Anexo <v-icon right>mdi-cloud-download-outline</v-icon>
+          </v-btn>
+          <br/>
+          <span class="time-left">{{ formatDate(item.data_envio) }} <v-icon right>{{ getIcon(item.data_leitura) }}</v-icon></span>
+        </div>
 
-      <div class="container-chat darker">
-        <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Avatar" class="right">
-        <p>Hey! I'm fine. Thanks for asking!</p>
-        <span class="time-left">11:01</span>
+        <div v-else class="container-chat" >
+          <!-- <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Avatar"> -->
+          <v-avatar id="avatar" color="#080912">
+            <v-icon dark>
+              mdi-account-circle
+            </v-icon>
+          </v-avatar>
+          <p>{{ item.texto }}</p>
+          <v-btn 
+            v-if="item.tem_anexo"
+            color="success"
+            outlined 
+            dark
+            small
+            @click="downloadAttachment(item.id, index)"
+          >
+            <v-icon left>{{ getIcon(item.data_anexo) }}</v-icon> Anexo <v-icon right>mdi-cloud-download-outline</v-icon>
+          </v-btn>
+          
+          <span class="time-right">{{ formatDate(item.data_envio) }} <v-icon right>{{ getIcon(item.data_leitura) }}</v-icon></span>
+        </div>
       </div>
+      
     </div>
     <div class="input-message">
       <v-form>
@@ -30,12 +57,19 @@
           rows="2"
           label="Message"
           type="text"
+          v-model="texto"
         >
           <template v-slot:append>
-            <v-btn icon>
-              <v-icon size="25">mdi-clippy</v-icon>
+            <v-btn icon @click="$refs.inputFile.click()">
+              <v-icon :color="anexo ? 'success' : 'secondary'" size="25">mdi-clippy</v-icon>
             </v-btn>
-            <v-btn icon>
+            <input
+              ref="inputFile"
+              type="file"
+              style="display: none"
+              @change="fileSelected"
+            />
+            <v-btn icon @click="sendMensagem">
               <v-icon size="25">mdi-send</v-icon>
             </v-btn>
           </template>
@@ -46,10 +80,109 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Component, Prop, Vue } from 'nuxt-property-decorator'
+import { fileToBase64 } from "../../utils"
+import { CreateMensagemDto } from "@/@types"
+import { saveAs } from 'file-saver'
 
 @Component
 export default class MessageViewerComponent extends Vue {
+  @Prop({type: String, required: true})
+  idConversa!: string;
+
+  @Prop({type: String, required: true})
+  idDestinatario!: string;
+
+  mensagens: Array<any> = []
+
+  id_conversa: string = ''
+  id_destinatario: string = ''
+  anexo: string = ''
+  ext: string = ''
+  texto: string = ''
+  valor: number = 0
+
+  created(){
+    this.getMensagensByIDConversa()
+  }
+
+  getMensagensByIDConversa(){
+    this.$store.dispatch('mensagem/getMensagensByIDConversa', this.idConversa)
+      .then(res => {
+        console.log(res.data);
+        this.mensagens = res.data;
+      })
+      .catch(err => {
+        console.log(err.response.data.message);
+      })
+      .finally(() => {
+      })
+  }
+
+  async fileSelected(event: any) {
+    if(!event.target.files.length) return
+
+    const file = new File(event.target.files, event.target.files[0].name)
+
+    const attachment = await fileToBase64(file)
+
+    const extension = event.target.files[0].name.split(".")
+    const ext = extension[extension.length - 1]
+
+    this.anexo = attachment
+    this.ext = ext
+  }
+
+  sendMensagem() {
+    let payload: CreateMensagemDto = {
+      id_conversa: this.idConversa,
+      id_destinatario: this.idDestinatario,
+      texto: this.texto,
+      valor: this.valor,
+      anexo: this.anexo,
+      ext: this.ext
+    }
+
+    this.$store.dispatch('mensagem/create', payload)
+      .then(res => {
+        this.texto = ''
+        this.valor = 0,
+        this.anexo = ''
+        this.ext = ''
+
+        this.mensagens.push(res.data)
+      })
+      .catch(() => {
+        console.log('deu ruim')
+      })
+  }
+
+  async downloadAttachment(id: string, index: number) {
+    const { data } = await this.$store.dispatch(
+      "mensagem/getMensagemByID",
+      id
+    )
+
+    if (!data.anexo) return
+
+    const attB64 = await fetch(`data:${data.ext};base64,${data.anexo}`)
+
+    const buf = await attB64.arrayBuffer()
+
+    const file = new File([buf], `${'download'}.${data.ext}`)
+
+    saveAs(file, `${'download'}.${data.ext}`)
+
+    if (data.atualizado) {
+      this.mensagens[index].data_anexo = new Date()
+    }
+
+  }
+
+  formatDate(date: string){
+    return this.$moment(date).format('LLL')
+  }
+
   getIcon(data: string | null){
     if (!data) {
       return 'mdi-check'
@@ -94,7 +227,7 @@ export default class MessageViewerComponent extends Vue {
 .darker {
   border-color: #464650;
   background-color: #464650;
-  color: #aaa;
+  color: #FFF;
 }
 
 /* Clear floats */
@@ -105,7 +238,7 @@ export default class MessageViewerComponent extends Vue {
 }
 
 /* Style images */
-.container-chat img {
+.container-chat #avatar {
   float: left;
   max-width: 60px;
   width: 100%;
@@ -114,7 +247,7 @@ export default class MessageViewerComponent extends Vue {
 }
 
 /* Style the right image */
-.container-chat img.right {
+.container-chat #avatar.right {
   float: right;
   margin-left: 20px;
   margin-right:0;
@@ -129,7 +262,7 @@ export default class MessageViewerComponent extends Vue {
 /* Style time text */
 .time-left {
   float: left;
-  color: #999;
+  color: #FFF;
 }
 
 </style>
