@@ -4,12 +4,12 @@ export const RequiresAuth: Middleware = (context) => {
   const logged = context.store.getters.tokenData
 
   if (!logged) {
-    context.redirect(context.store.state.url || '/login')
+    context.redirect('/login')
   }
   
   const isLoggedIn = context.store.getters.isLoggedIn
 
   if (!isLoggedIn) {
-    context.redirect(context.store.state.url || '/login')
+    context.redirect('/login')
   }
 }
