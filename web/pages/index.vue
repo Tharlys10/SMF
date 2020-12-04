@@ -37,8 +37,8 @@
               </v-list-item-avatar>
 
               <v-list-item-content>
-                <v-list-item-title>{{ item.usuario_s_nome }}</v-list-item-title>
-                <v-list-item-subtitle>{{ item.conversa_assunto }}</v-list-item-subtitle>
+                <v-list-item-title>{{ item.conversa_assunto }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item.usuario_s_nome }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -56,6 +56,7 @@
               :key="key"
               :idConversa="idConversa"
               :idDestinatario="idDestinatario"
+              v-on:commit-recharge="getMinhasConversas()"
             />
           </div>
         </div>
@@ -88,8 +89,17 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import { LoginDto } from '~/@types'
+import { RequiresAuth, RequiredAccess } from '~/middleware'
 
-@Component({})
+@Component({
+  meta: {
+    auth: {
+      requiredAccess: false,
+      requiresAuth: true
+    },
+  },
+  middleware: [RequiresAuth, RequiredAccess]
+})
 export default class HomePage extends Vue {
   openModalNewConversa: boolean = false;
   conversas: Array<any> = []
@@ -117,9 +127,12 @@ export default class HomePage extends Vue {
         this.conversas = res.data;
       })
       .catch(err => {
-        console.log(err.response.data.message);
-      })
-      .finally(() => {
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar buscar as conversa',
+          text: err.response.data.message
+        });
       })
   }
 }

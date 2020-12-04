@@ -55,15 +55,16 @@ export const getters: GetterTree<RootState, RootState> = {
       var atob = require('atob');
 
       const raws = state.token.split('.', -1)
+      
       const decoded = atob(raws[1])
       const parsed = JSON.parse(decoded)
-
+      
       const n = Date.now()
-      const e = Number(parsed.exp) / 1000      
+      const e = Number(parsed.exp) * 1000      
       
       const exp = new Date(e)
       const now = new Date(n)
-      
+
       if (now > exp) { return false }
     } catch (error) {
       return false
@@ -111,15 +112,13 @@ export const actions: ActionTree<RootState, RootState> = {
     })
   },
 
-  async sendLogin({ commit }, payload: LoginDto ) {
+  async sendLogin({ commit, dispatch }, payload: LoginDto ) {
     return new Promise((resolve, reject) => {
       this.$axios({
         url: `/auth`,
         data: payload,
         method: 'POST'
-      }).then(res => {
-        console.log(res.data);
-
+      }).then(async res => {
         const token = res.data.token
 
         commit('set_token', token)
@@ -128,10 +127,21 @@ export const actions: ActionTree<RootState, RootState> = {
           expires: new Date(Date.now() + 4 * 60 * 60 * 1000),
         })
 
+        await dispatch('getUserCurrent');
+
         resolve(res)
       }).catch(err => {
         reject(err)
       })
     })
   },
+
+  async logout({ commit }) {
+    this.app.$cookies.set('token-fom', '', {
+      expires: new Date(Date.now() + 10),
+    })
+
+    commit('set_token', '')
+  },
+
 }

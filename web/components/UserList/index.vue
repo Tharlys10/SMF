@@ -171,13 +171,17 @@ export default class UserListComponent extends Vue {
   getListaUsuarios(){
     this.$store.dispatch('usuario/getListUsers', this.params)
       .then(res => {
-        console.log(res.data);
         this.count = res.data.total
         this.items = res.data.data
       })
       .catch(err => {
         this.isLoadingTable = false
-        console.log(err.response.data.message);
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar listar os usuários',
+          text: err.response.data.message
+        });
       })
       .finally(() => this.isLoadingTable = false)
   }

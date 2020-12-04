@@ -44,15 +44,6 @@
           </template>
         </v-autocomplete>
         <v-text-field
-          v-model="valor"
-          type="number"
-          label="Valor"
-          min="0"
-          color="#000"
-          outlined
-          dense
-        />
-        <v-text-field
           v-model="assunto"
           label="* Assunto"
           color="#000"
@@ -80,6 +71,9 @@
               style="display: none"
               @change="fileSelected"
             />
+            <v-btn icon @click="openModalInsertValue = true">
+              <v-icon size="25" :color="valor > 0 ? 'success': 'secondary'">mdi-currency-usd-circle-outline</v-icon>
+            </v-btn>
           </template>
         </v-textarea>
       </v-form>
@@ -91,7 +85,7 @@
         text
         @click="commitClose"
       >
-        Cancela
+        Cancelar
       </v-btn>
       <v-btn
         color="success darken-1"
@@ -102,6 +96,20 @@
         Enviar
       </v-btn>
     </v-card-actions>
+
+    <v-dialog 
+      v-model="openModalInsertValue"
+      v-if="openModalInsertValue"
+      persistent
+      max-width="600px"
+    >
+      <InsertValue
+        v-if="openModalInsertValue" 
+        :valor="valor"
+        v-on:commit-close="openModalInsertValue = false"
+        v-on:commit-value="setValue"
+      />
+    </v-dialog>
   </v-card>
 </template>
 
@@ -118,6 +126,7 @@ import { mask } from 'vue-the-mask'
 })
 export default class NewConversaComponent extends Vue {
   validFormNewConversa: boolean = false
+  openModalInsertValue: boolean = false
 
   idDestinatario: Array<string> = []
   texto: string = ''
@@ -144,7 +153,11 @@ export default class NewConversaComponent extends Vue {
       this.getUsuarios(_search);
     }, 500);
   }
-
+  
+  setValue(v: any) {
+    this.valor = Number(v)
+    this.openModalInsertValue = false
+  }
 
   // Buscar usuarios para preencher o campo de envio das mensagens
   getUsuarios(nome: string){
@@ -154,11 +167,22 @@ export default class NewConversaComponent extends Vue {
 
     this.$store.dispatch('usuario/getUsuariosByName',  params)
       .then((res) => {
-        this.usuarios = res.data
+        res.data?.map((usr: any) => {
+          const estaNosUsuariosListados = 
+            this.usuarios.some(us => usr.email === us.email)
+          
+          if (!estaNosUsuariosListados) {
+            this.usuarios.push(usr)
+          }
+        })
       })
       .catch((err) => {
-        console.log(err.response.data.message);
-        
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar buscar os usuário',
+          text: err.response.data.message
+        });
       })
   }
 
@@ -192,7 +216,12 @@ export default class NewConversaComponent extends Vue {
         this.commitClose()
       })
       .catch(err => {
-        console.log(err.response.data.message);
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar criar a conversa',
+          text: err.response.data.message
+        });
       })
   }
 

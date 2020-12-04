@@ -123,11 +123,15 @@ export default class UserNewComponent extends Vue {
 
     this.$store.dispatch('usuario/create', payload)
       .then(res => {
-        console.log(res.data);
         this.commitClose();
       })
       .catch(err => {
-        console.log(err.response.data.message);
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar criar o usuário',
+          text: err.response.data.message
+        });
       })
   }
 

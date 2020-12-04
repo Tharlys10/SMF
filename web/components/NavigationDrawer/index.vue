@@ -16,12 +16,12 @@
           </v-list-item-avatar>
         </v-list-item>
 
-        <v-list-item link>
+        <v-list-item>
           <v-list-item-content>
             <v-list-item-title class="title">
-              {{ $store.state.userName }}
+              {{ $store.state.userName || 'Nome não encontrado' }}
             </v-list-item-title>
-            <v-list-item-subtitle>{{ $store.state.userMail }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ $store.state.userMail || 'E-mail não encontrado' }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -32,13 +32,21 @@
         nav
         dense
       >
-        <v-list-item link to="/">
+        <v-list-item 
+          v-if="$store.getters.isLoggedIn" 
+          link 
+          to="/"
+        >
           <v-list-item-icon>
             <v-icon>mdi-chat-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-title>Conversas</v-list-item-title>
         </v-list-item>
-        <v-list-item link to="/usuarios/list">
+        <v-list-item 
+          v-if="$store.getters.isLoggedIn && $store.state.userAcessoMaster"
+          link 
+          to="/usuarios/list"
+        >
           <v-list-item-icon>
             <v-icon>mdi-account-group-outline</v-icon>
           </v-list-item-icon>
