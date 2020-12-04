@@ -90,7 +90,7 @@ export class UsuarioService {
       .getRawMany()
   }
 
-  async listByNome(nome: string, masters: boolean): Promise<{ id: string, nome: string }[]> {
+  async listByNome(nome: string, id: string, master: boolean): Promise<{ id: string, nome: string, email: string }[]> {
     nome = nome ? '%'.concat(nome).concat('%')  : '%%'
 
     const caseWhereNome = `
@@ -99,16 +99,18 @@ export class UsuarioService {
         ELSE :nome = '%%'
       END
     `
-    const caseWhereMaster = masters ? 'usuario.master IS NOT NULL' : 'usuario.master = TRUE'
+    const caseWhereMaster = master ? 'usuario.master IS NOT NULL' : 'usuario.master = TRUE'
 
     return await this.repo.createQueryBuilder()
       .distinct()
       .select([
         'usuario.id id',
-        'usuario.nome nome'
+        'usuario.nome nome',
+        'usuario.email email'
       ])
       .from(Usuario, 'usuario')
-      .where(caseWhereNome, { nome })
+      .where('usuario.id <> :id', { id })
+      .andWhere(caseWhereNome, { nome })
       .andWhere(caseWhereMaster)
       .orderBy('usuario.nome', 'ASC')
       .limit(50)

@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, UnauthorizedException, UseGuards } 
 import { CurrentUser } from 'src/shared/decorators';
 import { CreateConversaDto } from 'src/shared/dtos/conversa.dto';
 import { Usuario } from 'src/shared/entities';
-import { Conversa } from 'src/shared/entities/conversa.entity';
 import { DefaultAuthGuard } from 'src/shared/guards';
 import { UsuarioService } from '../usuario/usuario.service';
 import { ConversaService } from './conversa.service';

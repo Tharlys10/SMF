@@ -1,100 +1,156 @@
--- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.9.2
--- PostgreSQL version: 12.0
--- Project Site: pgmodeler.io
--- Model Author: Osvaldo
+--
+-- PostgreSQL database dump
+--
 
--- object: comfin | type: ROLE --
--- DROP ROLE IF EXISTS comfin;
-CREATE ROLE comfin WITH 
-	SUPERUSER
-	CREATEDB
-	CREATEROLE
-	LOGIN;
--- ddl-end --
+-- Dumped from database version 11.10 (Ubuntu 11.10-1.pgdg20.04+1)
+-- Dumped by pg_dump version 11.10 (Ubuntu 11.10-1.pgdg20.04+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
--- Database creation must be done outside a multicommand file.
--- These commands were put in this file only as a convenience.
--- -- object: comfin | type: DATABASE --
--- -- DROP DATABASE IF EXISTS comfin;
--- CREATE DATABASE comfin;
--- -- ddl-end --
--- 
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+--
 
--- object: public.usuario | type: TABLE --
--- DROP TABLE IF EXISTS public.usuario CASCADE;
-CREATE TABLE public.usuario (
-	id serial NOT NULL,
-	nome character varying(250) NOT NULL,
-	email character varying(250) NOT NULL,
-	contato_nome character varying(250) NOT NULL,
-	contato_celular char(11) NOT NULL,
-	senha character varying(250) NOT NULL,
-	CONSTRAINT pk_usuario PRIMARY KEY (id)
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
-);
--- ddl-end --
-ALTER TABLE public.usuario OWNER TO comfin;
--- ddl-end --
 
--- object: public.mensagem | type: TABLE --
--- DROP TABLE IF EXISTS public.mensagem CASCADE;
-CREATE TABLE public.mensagem (
-	id serial NOT NULL,
-	id_conversa integer NOT NULL,
-	anexo smallint,
-	texto text NOT NULL,
-	valor double NOT NULL DEFAULT 0,
-	data_anexo timestamptz,
-	data_leitura timestamptz,
-	data_envio timestamptz NOT NULL,
-	CONSTRAINT pk_msg PRIMARY KEY (id_conversa,id)
-);
--- ddl-end --
-COMMENT ON COLUMN public.mensagem.data_anexo IS E'queremos saber quando ele pode ver o anexo';
--- ddl-end --
-ALTER TABLE public.mensagem OWNER TO comfin;
--- ddl-end --
+SET default_with_oids = false;
 
--- object: public.conversa | type: TABLE --
--- DROP TABLE IF EXISTS public.conversa CASCADE;
+--
+-- Name: conversa; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public.conversa (
-	id serial NOT NULL,
-	assunto character varying(250) NOT NULL,
-	data_inicio timestamptz NOT NULL,
-	id_remetente integer NOT NULL,
-	id_destinatario integer NOT NULL,
-	CONSTRAINT pk_conversa PRIMARY KEY (id)
-
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    assunto character varying(250) NOT NULL,
+    data_inicio timestamp with time zone DEFAULT now() NOT NULL,
+    id_usuario_primario uuid NOT NULL,
+    id_usuario_secundario uuid NOT NULL
 );
--- ddl-end --
-COMMENT ON COLUMN public.conversa.id_remetente IS E'Quem inicia a conversa';
--- ddl-end --
-COMMENT ON COLUMN public.conversa.id_destinatario IS E'a quem primeiro e deistinada a conversa';
--- ddl-end --
-ALTER TABLE public.conversa OWNER TO comfin;
--- ddl-end --
 
--- object: fk_conversa | type: CONSTRAINT --
--- ALTER TABLE public.mensagem DROP CONSTRAINT IF EXISTS fk_conversa CASCADE;
-ALTER TABLE public.mensagem ADD CONSTRAINT fk_conversa FOREIGN KEY (id_conversa)
-REFERENCES public.conversa (id) MATCH FULL
-ON DELETE NO ACTION ON UPDATE NO ACTION;
--- ddl-end --
 
--- object: fk_remetente | type: CONSTRAINT --
--- ALTER TABLE public.conversa DROP CONSTRAINT IF EXISTS fk_remetente CASCADE;
-ALTER TABLE public.conversa ADD CONSTRAINT fk_remetente FOREIGN KEY (id_remetente)
-REFERENCES public.usuario (id) MATCH FULL
-ON DELETE NO ACTION ON UPDATE NO ACTION;
--- ddl-end --
+--
+-- Name: COLUMN conversa.id_usuario_primario; Type: COMMENT; Schema: public; Owner: -
+--
 
--- object: fk_destinario | type: CONSTRAINT --
--- ALTER TABLE public.conversa DROP CONSTRAINT IF EXISTS fk_destinario CASCADE;
-ALTER TABLE public.conversa ADD CONSTRAINT fk_destinario FOREIGN KEY (id_destinatario)
-REFERENCES public.usuario (id) MATCH FULL
-ON DELETE NO ACTION ON UPDATE NO ACTION;
--- ddl-end --
+COMMENT ON COLUMN public.conversa.id_usuario_primario IS 'Quem inicia a conversa';
 
+
+--
+-- Name: COLUMN conversa.id_usuario_secundario; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.conversa.id_usuario_secundario IS 'a quem primeiro e deistinada a conversa';
+
+
+--
+-- Name: mensagem; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.mensagem (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id_conversa uuid NOT NULL,
+    id_remetente uuid NOT NULL,
+    anexo bytea,
+    texto text NOT NULL,
+    valor double precision DEFAULT 0 NOT NULL,
+    data_anexo timestamp with time zone,
+    data_leitura timestamp with time zone,
+    data_envio timestamp with time zone DEFAULT now() NOT NULL,
+    ext character varying(10)
+);
+
+
+--
+-- Name: usuario; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.usuario (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    nome character varying(250) NOT NULL,
+    email character varying(250) NOT NULL,
+    contato_nome character varying(250) NOT NULL,
+    contato_celular character(11) NOT NULL,
+    senha character varying(250) NOT NULL,
+    criado_em timestamp with time zone DEFAULT now() NOT NULL,
+    atualizado_em timestamp with time zone,
+    master boolean DEFAULT false NOT NULL
+);
+
+
+--
+-- Name: conversa pk_conversa; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.conversa
+    ADD CONSTRAINT pk_conversa PRIMARY KEY (id);
+
+
+--
+-- Name: mensagem pk_msg; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mensagem
+    ADD CONSTRAINT pk_msg PRIMARY KEY (id_conversa, id);
+
+
+--
+-- Name: usuario pk_usuario; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.usuario
+    ADD CONSTRAINT pk_usuario PRIMARY KEY (id);
+
+
+--
+-- Name: mensagem fk_conversa; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mensagem
+    ADD CONSTRAINT fk_conversa FOREIGN KEY (id_conversa) REFERENCES public.conversa(id) MATCH FULL;
+
+
+--
+-- Name: conversa fk_destinario; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.conversa
+    ADD CONSTRAINT fk_destinario FOREIGN KEY (id_usuario_secundario) REFERENCES public.usuario(id) MATCH FULL;
+
+
+--
+-- Name: conversa fk_remetente; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.conversa
+    ADD CONSTRAINT fk_remetente FOREIGN KEY (id_usuario_primario) REFERENCES public.usuario(id) MATCH FULL;
+
+
+--
+-- Name: mensagem fk_remetente; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mensagem
+    ADD CONSTRAINT fk_remetente FOREIGN KEY (id_remetente) REFERENCES public.usuario(id) MATCH FULL;
+
+
+--
+-- PostgreSQL database dump complete
+--
 
