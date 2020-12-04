@@ -77,8 +77,8 @@ export class UsuarioController {
   async listUsuariosToNewConversa(
     @Query() { nome }: { nome: string },
     @CurrentUser() currentUser: Usuario
-  ): Promise<{ id: string, nome: string }[]> {
-    const usuarios = await this.usuarioService.listByNome(nome, currentUser.master)
+  ): Promise<{ id: string, nome: string, email: string }[]> {
+    const usuarios = await this.usuarioService.listByNome(nome, currentUser.id, currentUser.master)
 
     usuarios.forEach(usr => {
       usr.id = encrypt(usr.id)

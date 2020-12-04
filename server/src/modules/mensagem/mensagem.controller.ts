@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, NotImplementedException, Param, Post, Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/shared/decorators';
 import { CreateMensagemDto, CreateMensagemEConversaDto } from 'src/shared/dtos';
 import { Mensagem, Usuario } from 'src/shared/entities';
@@ -38,6 +38,7 @@ export class MensagemController {
   ): Promise<{ ids: string[] }> {
     let conversasCriadas: string[] = []
     let mensagensCriadas: string[] = []
+
     mensagem.id_remetente = currentUser.id
 
     mensagem.id_destinatario = mensagem.id_destinatario.map(id => decrypt(id))
@@ -105,7 +106,7 @@ export class MensagemController {
     @Query() pagination: Pagination,
     @CurrentUser() currentUser: Usuario
   ): Promise<Mensagem[]> {
-    await this.mensagemService.view(currentUser.id, id)
+    await this.mensagemService.viewMensagem(currentUser.id, id)
 
     const mensagens = await this.mensagemService.listByConversa(currentUser.id, id, pagination)
 
@@ -122,7 +123,14 @@ export class MensagemController {
     @Param('id') id: string,
     @CurrentUser() currentUser: Usuario
   ): Promise<{ id: string, anexo: string, ext: string, atualizado: boolean }> {
-    return await this.mensagemService.indexWithAnexo(id, currentUser.id)
+    const anexo = await this.mensagemService.indexWithAnexo(id)
+
+    const atualizado = await this.mensagemService.viewAnexo(id, currentUser.id)
+
+    return {
+      ...anexo,
+      atualizado
+    }
   }
 
   @Put('conversa/:id/visualizar')

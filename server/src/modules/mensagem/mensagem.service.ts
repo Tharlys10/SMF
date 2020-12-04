@@ -79,28 +79,28 @@ export class MensagemService {
     return await this.repo.findOne({ id })
   }
 
-  async indexWithAnexo(id: string, id_usuario: string): Promise<{ id: string, anexo: string, ext: string, atualizado: boolean }> {
+  async indexWithAnexo(id: string): Promise<{ id: string, anexo: string, ext: string }> {
     const { id: idm, anexo, ext } = await this.repo.findOne({
       select: ['id', 'anexo', 'ext'],
       where: { id }
     })
 
+    return { id: idm, anexo: anexo.toString('base64'), ext }
+  }
+
+  async viewAnexo(id: string, id_usuario: string): Promise<boolean> {
     const updated = await this.repo.createQueryBuilder()
       .update(Mensagem)
       .set({ data_anexo: new Date() })
-      .where('id_remetente = :id', { id: id_usuario })
-      .andWhere('id <> :id', { id: idm })
+      .where('id = :id', { id })
+      .andWhere('id_remetente <> :id_remetente', { id_remetente: id_usuario })
       .andWhere('data_anexo IS NULL')
       .execute()
 
-    console.log(updated.affected);
-    // verificar porque quando o usuário que envia a mensagem baixa e consegue marcar o anexo como visto
-
-
-    return { id: idm, anexo: anexo.toString('base64'), ext, atualizado: !!updated.affected }
+    return !!updated.affected
   }
 
-  async view(id_usuario: string, id_conversa: string): Promise<boolean> {
+  async viewMensagem(id_usuario: string, id_conversa: string): Promise<boolean> {
     const updated = await this.repo.createQueryBuilder()
       .update(Mensagem)
       .set({ data_leitura: new Date() })

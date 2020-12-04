@@ -32,7 +32,6 @@ export class CreateMensagemEConversaDto {
   texto: string
 
   @IsNotEmpty()
-  @IsNumber()
   valor: number
 
   // campos relacionados a conversa
