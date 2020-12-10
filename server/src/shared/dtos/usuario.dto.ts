@@ -31,6 +31,7 @@ export class UpdateUsuarioDto {
   email?: string
   contato_nome?: string
   contato_celular?: string
+  id_tipo?: number
 }
 
 export class FilterUsuarios {

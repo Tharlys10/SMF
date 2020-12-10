@@ -63,7 +63,8 @@ export class MensagemController {
         const conversaCriada = await this.conversaService.create({
           id_usuario_primario: mensagem.id_remetente,
           id_usuario_secundario: dstn,
-          assunto: mensagem.assunto
+          assunto: mensagem.assunto,
+          id_categoria: mensagem.id_categoria
         })
 
         conversasCriadas.push(conversaCriada.id)

@@ -80,6 +80,7 @@ export class UsuarioService {
         'usuario.contato_nome contato_nome',
         'usuario.contato_celular contato_celular',
         'usuario.criado_em criado_em',
+        'tipo.id id_tipo',
         'tipo.descricao tipo',
         'tipo.cor tipo_cor'
       ])

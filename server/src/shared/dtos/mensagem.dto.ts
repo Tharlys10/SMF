@@ -42,4 +42,8 @@ export class CreateMensagemEConversaDto {
   @IsNotEmpty()
   @IsString()
   assunto: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  id_categoria: number
 }
