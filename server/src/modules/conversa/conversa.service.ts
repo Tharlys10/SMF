@@ -39,7 +39,7 @@ export class ConversaService {
         'usuario_p.nome',
         'usuario_s.nome',
         '(SELECT data_envio FROM mensagem m WHERE m.id_conversa = conversa.id ORDER BY m.data_envio DESC LIMIT 1) data_ultima_mensagem',
-        `(SELECT count(*) FROM mensagem m WHERE m.id_conversa = conversa.id AND m.id_remetente <> '${id_usuario}' AND data_leitura IS NULL) total_nao_lidas`
+        `(SELECT count(*) FROM mensagem m WHERE m.id_conversa = conversa.id AND m.id_remetente <> '${id_usuario}' AND data_leitura IS NULL)::integer total_nao_lidas`
       ])
       .leftJoin(Usuario, 'usuario_p', 'usuario_p.id = conversa.id_usuario_primario')
       .leftJoin(Usuario, 'usuario_s', 'usuario_s.id = conversa.id_usuario_secundario')

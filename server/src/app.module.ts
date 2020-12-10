@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsuarioModule } from './modules/usuario/usuario.module';
 import { MensagemModule } from './modules/mensagem/mensagem.module';
 import { ConversaModule } from './modules/conversa/conversa.module';
+import { AnexoModule } from './modules/anexo/anexo.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { ConversaModule } from './modules/conversa/conversa.module';
     AuthModule,
     UsuarioModule,
     MensagemModule,
-    ConversaModule
+    ConversaModule,
+    AnexoModule
   ],
   controllers: [],
   providers: [],
