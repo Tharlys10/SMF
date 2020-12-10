@@ -1,0 +1,86 @@
+version: "3.7"
+
+services:
+  database:
+    build: ./database
+    image: mensagens/database
+    container_name: mensagens_database
+    restart: always
+    environment:
+      - POSTGRES_USER=messenger
+      - POSTGRES_PASSWORD=ms1010aa
+      - POSTGRES_DB=mensagens
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - mensagens
+  server:
+    build: ./server
+    image: mensagens/server
+    container_name: mensagens_server
+    restart: always
+    environment:
+      - DB_PORT=5432
+      - DB_HOST=mensagens_database
+      - DB_USER=messenger
+      - DB_PASS=ms1010aa
+      - DB_NAME=mensagens
+    expose:
+      - "4000"
+    networks:
+      - mensagens
+  client:
+    build:
+      context: ./web
+      args:
+        - REST_ENDPOINT_SERVER=http://mensagens_server:4000/
+        - REST_ENDPOINT_CLIENT=https://fit.grupobrisanet.com.br/server/
+        - BASE_URL=/
+    image: mensagens/client
+    container_name: mensagens_client
+    restart: always
+    expose:
+      - "3000"
+    depends_on:
+      - server
+    networks:
+      - mensagens
+  nginx:
+    image: nginx:stable-alpine
+    container_name: mensagens_nginx
+    restart: always
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+    expose:
+      - "80"
+    depends_on:
+      - server
+      - client
+    networks:
+      - mensagens
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.mensagens-http.rule=Host(`fit.grupobrisanet.com.br`)"
+      - "traefik.http.routers.mensagens-http.entrypoints=web"
+      - "traefik.http.middlewares.mensagens-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.mensagens-http.middlewares=mensagens-https-redirect"
+      - "traefik.http.routers.mensagens-https.rule=Host(`fit.grupobrisanet.com.br`)"
+      - "traefik.http.routers.mensagens-https.entrypoints=websecure"
+      - "traefik.http.routers.mensagens-https.tls=true"
+      - "traefik.http.routers.mensagens-https.tls.certresolver=cti-ssl-resolver"
+      - "traefik.http.services.mensagens.loadbalancer.server.port=80"
+
+networks:
+  mensagens:
+    name: mensagens-network
+  proxy:
+    external:
+      name: proxy
+
+volumes:
+  pgdata:
+    name: pgdata

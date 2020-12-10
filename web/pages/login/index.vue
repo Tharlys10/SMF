@@ -71,10 +71,21 @@ export default class LoginPage extends Vue {
 
     this.$store.dispatch('sendLogin', payload)
       .then(res => {
+        this.$notify({
+          group: 'notifications',
+          type: 'success',
+          title: 'Bem-vindo',
+        });
+
         this.$router.push('/')
       })
       .catch(err => {
-        console.log(err.response.data.message);
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar realizar o login',
+          text: err.response.data.message
+        });
       })
   }
 }

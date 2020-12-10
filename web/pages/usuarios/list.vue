@@ -10,8 +10,17 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
+import { RequiresAuth, RequiredAccess } from '~/middleware'
 
-@Component
+@Component({
+  meta: {
+    auth: {
+      requiredAccess: true,
+      requiresAuth: true
+    },
+  },
+  middleware: [RequiresAuth, RequiredAccess]
+})
 export default class UsuariosListPage extends Vue {
   
 }

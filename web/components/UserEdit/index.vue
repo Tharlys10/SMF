@@ -128,11 +128,20 @@ export default class UserNewComponent extends Vue {
 
     this.$store.dispatch('usuario/update', { payload, id: this.idUser })
       .then(res => {
-        console.log(res.data);
+        this.$notify({
+          group: 'notifications',
+          type: 'success',
+          title: 'Usuário atualizado com sucesso',
+        });
         this.commitClose();
       })
       .catch(err => {
-        console.log(err.response.data.message);
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar atualizar o usuário',
+          text: err.response.data.message
+        });
       })
   }
 

@@ -3,12 +3,17 @@
     <div class="messages">
       <div v-for="(item, index) in mensagens" :key="item.id">
         <div  v-if="!item.e_remetente" class="container-chat darker">
-          <!-- <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Avatar" class="right"> -->
           <v-avatar id="avatar" color="#080912">
             <v-icon dark>
               mdi-account-circle
             </v-icon>
           </v-avatar>
+          <p v-if="item.valor > 0"> Valor: 
+            {{ Intl.NumberFormat('pt-BR', {
+              currency: 'BRL',
+              style: 'currency'
+            }).format(item.valor)}}
+          </p>
           <p>{{ item.texto }}</p>
           <v-btn 
             v-if="item.tem_anexo"
@@ -26,12 +31,17 @@
         </div>
 
         <div v-else class="container-chat" >
-          <!-- <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Avatar"> -->
           <v-avatar id="avatar" color="#080912">
             <v-icon dark>
               mdi-account-circle
             </v-icon>
           </v-avatar>
+          <p v-if="item.valor > 0"> Valor: 
+            {{ Intl.NumberFormat('pt-BR', {
+              currency: 'BRL',
+              style: 'currency'
+            }).format(item.valor)}}
+          </p>
           <p>{{ item.texto }}</p>
           <v-btn 
             v-if="item.tem_anexo"
@@ -55,7 +65,7 @@
           color="#000"
           outlined
           rows="2"
-          label="Message"
+          label="Mensagem"
           type="text"
           v-model="texto"
         >
@@ -69,6 +79,9 @@
               style="display: none"
               @change="fileSelected"
             />
+            <v-btn icon @click="openModalInsertValue = true">
+              <v-icon size="25" :color="valor > 0 ? 'success': 'secondary'">mdi-currency-usd-circle-outline</v-icon>
+            </v-btn>
             <v-btn icon @click="sendMensagem">
               <v-icon size="25">mdi-send</v-icon>
             </v-btn>
@@ -76,6 +89,20 @@
         </v-textarea>
       </v-form>
     </div>
+
+    <v-dialog 
+      v-model="openModalInsertValue"
+      v-if="openModalInsertValue"
+      persistent
+      max-width="600px"
+    >
+      <InsertValue
+        v-if="openModalInsertValue" 
+        :valor="valor"
+        v-on:commit-close="openModalInsertValue = false"
+        v-on:commit-value="setValue"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -93,6 +120,8 @@ export default class MessageViewerComponent extends Vue {
   @Prop({type: String, required: true})
   idDestinatario!: string;
 
+  openModalInsertValue: boolean = false
+  
   mensagens: Array<any> = []
 
   id_conversa: string = ''
@@ -106,16 +135,23 @@ export default class MessageViewerComponent extends Vue {
     this.getMensagensByIDConversa()
   }
 
+  setValue(v: any) {
+    this.valor = Number(v)
+    this.openModalInsertValue = false
+  }
+
   getMensagensByIDConversa(){
     this.$store.dispatch('mensagem/getMensagensByIDConversa', this.idConversa)
       .then(res => {
-        console.log(res.data);
         this.mensagens = res.data;
       })
       .catch(err => {
-        console.log(err.response.data.message);
-      })
-      .finally(() => {
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar buscar as mensagens',
+          text: err.response.data.message
+        });
       })
   }
 
@@ -151,9 +187,16 @@ export default class MessageViewerComponent extends Vue {
         this.ext = ''
 
         this.mensagens.push(res.data)
+
+        this.$emit('commit-recharge')
       })
-      .catch(() => {
-        console.log('deu ruim')
+      .catch((err) => {
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar criar mensagem',
+          text: err.response.data.message
+        });
       })
   }
 
