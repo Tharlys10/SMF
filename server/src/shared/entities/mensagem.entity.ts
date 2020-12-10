@@ -11,20 +11,17 @@ export class Mensagem {
   @Column({ type: 'uuid', name: 'id_remetente' })
   id_remetente: string
 
-  @Column({ type: 'bytea', nullable: true })
-  anexo?: Buffer
+  // @Column({ type: 'bytea', nullable: true })
+  // anexo?: Buffer
 
-  @Column({ type: 'character varying', length: 10, nullable: true })
-  ext?: string
+  // @Column({ type: 'character varying', length: 10, nullable: true })
+  // ext?: string
 
   @Column({ type: 'text' })
   texto: string
 
   @Column({ type: 'double precision', default: 0 })
   valor: number
-
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  data_anexo?: Date
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   data_leitura?: Date

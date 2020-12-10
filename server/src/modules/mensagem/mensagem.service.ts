@@ -12,18 +12,12 @@ export class MensagemService {
   ) {}
 
   async create(mensagem: CreateMensagemDto): Promise<any> {
-    const anexoBuffer = mensagem.anexo ? Buffer.from(mensagem.anexo.split(',')[1], 'base64') : null
+    // const anexoBuffer = mensagem.anexo ? Buffer.from(mensagem.anexo.split(',')[1], 'base64') : null
 
-    const { id, id_remetente } = await this.repo.save(this.repo.create({
-      ...mensagem,
-      anexo: anexoBuffer
-    }))
+    const { id, id_remetente } = await this.repo.save(this.repo.create(mensagem))
 
     const caseAnexoSelect = `
-      CASE
-        WHEN mensagem.anexo IS NOT NULL THEN true
-        ELSE false
-      END AS tem_anexo
+      (SELECT COUNT(*) FROM anexo WHERE anexo.id_mensagem = mensagem.id)::integer anexos
     `
     const caseRemetenteSelect = `
       CASE
@@ -41,7 +35,6 @@ export class MensagemService {
         caseAnexoSelect,
         'mensagem.texto texto',
         'mensagem.valor valor',
-        'mensagem.data_anexo data_anexo',
         'mensagem.data_leitura data_leitura',
         'mensagem.data_envio data_envio'
       ])
@@ -50,19 +43,19 @@ export class MensagemService {
       .getRawOne()
   }
 
-  async visualizeAnexoByMensagem(id: string): Promise<Mensagem> {
-    const mensagem = await this.index(id)
+  // async visualizeAnexoByMensagem(id: string): Promise<Mensagem> {
+  //   const mensagem = await this.index(id)
 
-    if (!mensagem.data_anexo) {
-      await this.repo.createQueryBuilder()
-        .update(Mensagem)
-        .set({ data_anexo: new Date() })
-        .where('id = :id', { id })
-        .execute()
-    }
+  //   if (!mensagem.data_anexo) {
+  //     await this.repo.createQueryBuilder()
+  //       .update(Mensagem)
+  //       .set({ data_anexo: new Date() })
+  //       .where('id = :id', { id })
+  //       .execute()
+  //   }
 
-    return mensagem
-  }
+  //   return mensagem
+  // }
 
   async visualizeAllByConversa(id_conversa: string): Promise<boolean> {
     const updated = await this.repo.createQueryBuilder()
@@ -79,26 +72,26 @@ export class MensagemService {
     return await this.repo.findOne({ id })
   }
 
-  async indexWithAnexo(id: string): Promise<{ id: string, anexo: string, ext: string }> {
-    const { id: idm, anexo, ext } = await this.repo.findOne({
-      select: ['id', 'anexo', 'ext'],
-      where: { id }
-    })
+  // async indexWithAnexo(id: string): Promise<{ id: string, anexo: string, ext: string }> {
+  //   const { id: idm, anexo, ext } = await this.repo.findOne({
+  //     select: ['id', 'anexo', 'ext'],
+  //     where: { id }
+  //   })
 
-    return { id: idm, anexo: anexo.toString('base64'), ext }
-  }
+  //   return { id: idm, anexo: anexo.toString('base64'), ext }
+  // }
 
-  async viewAnexo(id: string, id_usuario: string): Promise<boolean> {
-    const updated = await this.repo.createQueryBuilder()
-      .update(Mensagem)
-      .set({ data_anexo: new Date() })
-      .where('id = :id', { id })
-      .andWhere('id_remetente <> :id_remetente', { id_remetente: id_usuario })
-      .andWhere('data_anexo IS NULL')
-      .execute()
+  // async viewAnexo(id: string, id_usuario: string): Promise<boolean> {
+  //   const updated = await this.repo.createQueryBuilder()
+  //     .update(Mensagem)
+  //     .set({ data_anexo: new Date() })
+  //     .where('id = :id', { id })
+  //     .andWhere('id_remetente <> :id_remetente', { id_remetente: id_usuario })
+  //     .andWhere('data_anexo IS NULL')
+  //     .execute()
 
-    return !!updated.affected
-  }
+  //   return !!updated.affected
+  // }
 
   async viewMensagem(id_usuario: string, id_conversa: string): Promise<boolean> {
     const updated = await this.repo.createQueryBuilder()
@@ -112,7 +105,7 @@ export class MensagemService {
     return !!updated.affected
   }
 
-  async listByConversa(id_usuario: string, id_conversa: string, pagination: Pagination): Promise<Mensagem[]> {
+  async listByConversa(id_usuario: string, id_conversa: string, pagination: Pagination): Promise<any[]> {
     if (!pagination) {
       pagination = { page: 0, limit: 50 }
     }
@@ -121,10 +114,7 @@ export class MensagemService {
     const limit = pagination.limit ? pagination.limit < 0 ? 50 : pagination.limit : 50
 
     const caseAnexoSelect = `
-      CASE
-        WHEN mensagem.anexo IS NOT NULL THEN true
-        ELSE false
-      END AS tem_anexo
+      (SELECT COUNT(*) FROM anexo WHERE anexo.id_mensagem = mensagem.id)::integer anexos
     `
     const caseRemetenteSelect = `
       CASE
@@ -143,7 +133,7 @@ export class MensagemService {
         caseAnexoSelect,
         'mensagem.texto texto',
         'mensagem.valor valor',
-        'mensagem.data_anexo data_anexo',
+        // 'mensagem.data_anexo data_anexo',
         'mensagem.data_leitura data_leitura',
         'mensagem.data_envio data_envio'
       ])

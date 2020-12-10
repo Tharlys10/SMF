@@ -25,9 +25,7 @@ export class MensagemController {
   ): Promise<any> {
     mensagem.id_remetente = currentUser.id
 
-    const mensagemCriada = await this.mensagemService.create(mensagem)
-
-    return mensagemCriada
+    return await this.mensagemService.create(mensagem)
   }
 
   @Post('conversa')
@@ -87,16 +85,24 @@ export class MensagemController {
     return { ids: mensagensCriadas }
   }
 
-  @Put(':id/anexo/visualizar')
+  // @Put(':id/anexo/visualizar')
+  // @UseGuards(DefaultAuthGuard)
+  // async visualizeAnexoByConversa(
+  //   @Param('id') id: string
+  // ): Promise<Mensagem> {
+  //   const mensagem = await this.mensagemService.visualizeAnexoByMensagem(id)
+
+  //   mensagem.id_remetente = encrypt(mensagem.id_remetente)
+
+  //   return mensagem
+  // }
+
+  @Put('conversa/:id/visualizar')
   @UseGuards(DefaultAuthGuard)
-  async visualizeAnexoByConversa(
+  async visualizeByConversa(
     @Param('id') id: string
-  ): Promise<Mensagem> {
-    const mensagem = await this.mensagemService.visualizeAnexoByMensagem(id)
-
-    mensagem.id_remetente = encrypt(mensagem.id_remetente)
-
-    return mensagem
+  ): Promise<boolean> {
+    return await this.mensagemService.visualizeAllByConversa(id)
   }
 
   @Get('conversa/:id')
@@ -117,27 +123,19 @@ export class MensagemController {
     return mensagens
   }
 
-  @Get(':id')
-  @UseGuards(DefaultAuthGuard)
-  async index(
-    @Param('id') id: string,
-    @CurrentUser() currentUser: Usuario
-  ): Promise<{ id: string, anexo: string, ext: string, atualizado: boolean }> {
-    const anexo = await this.mensagemService.indexWithAnexo(id)
+  // @Get(':id')
+  // @UseGuards(DefaultAuthGuard)
+  // async index(
+  //   @Param('id') id: string,
+  //   @CurrentUser() currentUser: Usuario
+  // ): Promise<{ id: string, anexo: string, ext: string, atualizado: boolean }> {
+  //   const anexo = await this.mensagemService.indexWithAnexo(id)
 
-    const atualizado = await this.mensagemService.viewAnexo(id, currentUser.id)
+  //   const atualizado = await this.mensagemService.viewAnexo(id, currentUser.id)
 
-    return {
-      ...anexo,
-      atualizado
-    }
-  }
-
-  @Put('conversa/:id/visualizar')
-  @UseGuards(DefaultAuthGuard)
-  async visualizeByConversa(
-    @Param('id') id: string
-  ): Promise<boolean> {
-    return await this.mensagemService.visualizeAllByConversa(id)
-  }
+  //   return {
+  //     ...anexo,
+  //     atualizado
+  //   }
+  // }
 }
