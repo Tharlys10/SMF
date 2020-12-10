@@ -31,6 +31,7 @@
           :type="!obscuredSenha ? 'text' : 'password'"
           @click:append="obscuredSenha = !obscuredSenha"
           required
+          @keyup.enter="senha.length >= 8 ? sendLogin() : null"
         />
 
         <v-btn

@@ -2,7 +2,7 @@
   <v-app>
     <v-main>
       <v-container fluid>
-        <notifications group="notifications" />
+        <notifications group="notifications" />  
         <nuxt />  
       </v-container>
     </v-main>

@@ -52,6 +52,21 @@
           ]"
           prepend-inner-icon="mdi-cellphone-basic"
         />
+        <v-select
+          v-model="id_tipo"
+          label="* Tipo"
+          :items="tipos"
+          color="#000"
+          outlined
+          dense
+          :rules="[
+            v => !!v || 'Tipo é obrigatório',
+          ]"
+          item-text="nome"
+          item-value="id"
+          prepend-inner-icon="mdi-tag-outline"
+          no-data-text="Nenhum tipo encontrado!"
+        ></v-select>
       </v-form>
     </v-card-text>
     <v-card-actions>
@@ -77,7 +92,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
-import { UpdateUsuarioDto } from '~/@types'
+import { UpdateUsuarioDto, TipoDto } from '~/@types'
 import { mask } from 'vue-the-mask'
 
 @Component({
@@ -101,6 +116,9 @@ export default class UserNewComponent extends Vue {
   @Prop({type: String, required: true})
   contatoTelefoneUser!: string
 
+  @Prop({type: Number, required: true})
+  idTipoUser!: number
+
   emailPattern = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|\\[\x01-\x09\x0B\x0C\x0E-\x7F])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21-\x5A\x53-\x7F]|\\[\x01-\x09\x0B\x0C\x0E-\x7F])+)\])/
 
   validFormUpdateUser: boolean = false
@@ -110,12 +128,18 @@ export default class UserNewComponent extends Vue {
   email: string = ''
   contatoNome: string = ''
   contatoTelefone: string = ''
+  id_tipo: number = 0
+
+  tipos: Array<TipoDto> = []
 
   created(){
     this.nome = this.nomeUser
     this.email = this.emailUser
     this.contatoNome = this.contatoNomeUser
     this.contatoTelefone = this.contatoTelefoneUser
+    this.id_tipo = this.idTipoUser
+
+    this.getTipos();
   }
 
   sendUpdateUser(){
@@ -123,7 +147,8 @@ export default class UserNewComponent extends Vue {
       nome: this.nome,
       email: this.email,
       contato_nome: this.contatoNome,
-      contato_celular: this.contatoTelefone.replace(/\D/g, '')
+      contato_celular: this.contatoTelefone.replace(/\D/g, ''),
+      id_tipo: this.id_tipo
     }
 
     this.$store.dispatch('usuario/update', { payload, id: this.idUser })
@@ -140,6 +165,21 @@ export default class UserNewComponent extends Vue {
           group: 'notifications',
           type: 'error',
           title: 'Erro ao tentar atualizar o usuário',
+          text: err.response.data.message
+        });
+      })
+  }
+
+  getTipos(){
+    this.$store.dispatch('tipos/getTipos')
+      .then(res => {
+        this.tipos = res.data
+      })
+      .catch(err => {
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar buscar os tipos',
           text: err.response.data.message
         });
       })

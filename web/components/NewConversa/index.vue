@@ -43,6 +43,20 @@
             </template>
           </template>
         </v-autocomplete>
+        <v-select
+          v-model="id_categoria"
+          label="* Categoria"
+          :items="categorias"
+          color="#000"
+          outlined
+          dense
+          :rules="[
+            v => !!v || 'Categoria é obrigatória',
+          ]"
+          item-text="nome"
+          item-value="id"
+          no-data-text="Nenhuma categoria encontrada!"
+        ></v-select>
         <v-text-field
           v-model="assunto"
           label="* Assunto"
@@ -115,7 +129,7 @@
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'nuxt-property-decorator'
-import { CreateMensagemEConversaDto } from '~/@types'
+import { CreateMensagemEConversaDto, CategoriaDto } from '~/@types'
 import { fileToBase64 } from "../../utils";
 import { mask } from 'vue-the-mask'
 
@@ -135,6 +149,9 @@ export default class NewConversaComponent extends Vue {
   anexo: string = ''
   ext: string = ''
 
+  id_categoria: number = 0
+  categorias: Array<CategoriaDto> = []
+
   // Funções e variveis de controles no campo usuarios
   // No formulario de nova conversa
   searchUsuarios: string = ""
@@ -152,6 +169,10 @@ export default class NewConversaComponent extends Vue {
     this.timeout = setTimeout(() => {
       this.getUsuarios(_search);
     }, 500);
+  }
+
+  created(){
+    this.getCategorias()
   }
   
   setValue(v: any) {
@@ -207,12 +228,12 @@ export default class NewConversaComponent extends Vue {
       texto: this.texto,
       valor: this.valor,
       id_destinatario: this.idDestinatario,
-      assunto: this.assunto
+      assunto: this.assunto,
+      id_categoria: Number(this.id_categoria)
     }
 
     this.$store.dispatch('mensagem/createMensagemEConverso', payload)
       .then(res => {
-        console.log(res.data);
         this.commitClose()
       })
       .catch(err => {
@@ -220,6 +241,21 @@ export default class NewConversaComponent extends Vue {
           group: 'notifications',
           type: 'error',
           title: 'Erro ao tentar criar a conversa',
+          text: err.response.data.message
+        });
+      })
+  }
+
+  getCategorias(){
+    this.$store.dispatch('categorias/getCategorias')
+      .then(res => {
+        this.categorias = res.data
+      })
+      .catch(err => {
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar buscar as categorias',
           text: err.response.data.message
         });
       })

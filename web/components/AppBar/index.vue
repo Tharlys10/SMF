@@ -12,8 +12,8 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn @click="logout" icon>
-      <v-icon>mdi-logout</v-icon>
+    <v-btn @click="logout" text>
+      Sair <v-icon right>mdi-logout</v-icon>
     </v-btn>
   </v-app-bar>
 </template>

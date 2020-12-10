@@ -35,6 +35,18 @@
         loading-text="Buscando usuários..."
         no-data-text="Nenhum usuário encontrado!"
       >
+        <template v-slot:item.tipo="{ item }">
+          <div>
+            <v-chip
+              class="ma-2"
+              :color="item.tipo_cor"
+              text-color="white"
+            >
+              {{ item.tipo }}
+            </v-chip>
+          </div>
+        </template>
+
         <template v-slot:item.contato_celular="{ item }">
           <div>
             {{ item.contato_celular.replace(/(\d{2})(\d{5})(\d{4})/, "($1)$2-$3")}}
@@ -42,14 +54,21 @@
         </template>
 
         <template v-slot:item.actions="{ item }">
-          <v-btn
-            icon
-            @click="dadosModalUpdateUSer = item, openModalUpdateUser = true"
-          >
-            <v-icon color="primary">
-              mdi-pencil
-            </v-icon>
-          </v-btn>
+          <v-tooltip left color="#E26724">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                v-on="on"
+                @click="dadosModalUpdateUSer = item, openModalUpdateUser = true"
+              >
+                <v-icon color="primary">
+                  mdi-pencil
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Editar dados</span>
+          </v-tooltip>
         </template>
       </v-data-table>
     </v-card>
@@ -111,6 +130,12 @@ export default class UserListComponent extends Vue {
       align: 'start',
       sortable: false,
       value: 'nome',
+    },
+    {
+      text: 'Tipo',
+      align: 'start',
+      sortable: false,
+      value: 'tipo',
     },
     { 
       text: 'E-mail', 

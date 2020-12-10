@@ -9,6 +9,7 @@ export interface CreateUsuarioDto {
   contato_nome: string
   contato_celular: string
   senha: string
+  id_tipo: number
 }
 
 export interface CreateMensagemDto {
@@ -26,6 +27,7 @@ export interface UpdateUsuarioDto {
   email?: string
   contato_nome?: string
   contato_celular?: string
+  id_tipo: number
 }
 
 export interface CreateMensagemEConversaDto {
@@ -35,4 +37,17 @@ export interface CreateMensagemEConversaDto {
   valor: number
   id_destinatario: string[]
   assunto: string
+  id_categoria: number
+}
+
+export interface CategoriaDto {
+  id: number
+  nome: string
+  color: string
+}
+
+export interface TipoDto {
+  id: number
+  nome: string
+  color: string
 }
