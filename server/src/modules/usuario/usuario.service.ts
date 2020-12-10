@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Usuario } from '../../shared/entities';
+import { Tipo, Usuario } from '../../shared/entities';
 import { In, Repository } from 'typeorm';
 import { CreateUsuarioDto, FilterUsuarios, UpdateUsuarioDto } from 'src/shared/dtos';
 
@@ -79,9 +79,12 @@ export class UsuarioService {
         'usuario.email email',
         'usuario.contato_nome contato_nome',
         'usuario.contato_celular contato_celular',
-        'usuario.criado_em criado_em'
+        'usuario.criado_em criado_em',
+        'tipo.descricao tipo',
+        'tipo.cor tipo_cor'
       ])
       .from(Usuario, 'usuario')
+      .leftJoin(Tipo, 'tipo', 'tipo.id = usuario.id_tipo')
       .where('usuario.master = false')
       .andWhere(caseWhereFilter, { busca })
       .orderBy('usuario.nome', 'ASC')
@@ -106,9 +109,12 @@ export class UsuarioService {
       .select([
         'usuario.id id',
         'usuario.nome nome',
-        'usuario.email email'
+        'usuario.email email',
+        'tipo.descricao tipo',
+        'tipo.cor tipo_cor'
       ])
       .from(Usuario, 'usuario')
+      .leftJoin(Tipo, 'tipo', 'tipo.id = usuario.id_tipo')
       .where('usuario.id <> :id', { id })
       .andWhere(caseWhereNome, { nome })
       .andWhere(caseWhereMaster)

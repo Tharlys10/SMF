@@ -5,6 +5,7 @@ import { UsuarioModule } from './modules/usuario/usuario.module';
 import { MensagemModule } from './modules/mensagem/mensagem.module';
 import { ConversaModule } from './modules/conversa/conversa.module';
 import { AnexoModule } from './modules/anexo/anexo.module';
+import { TipoModule } from './modules/tipo/tipo.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AnexoModule } from './modules/anexo/anexo.module';
     UsuarioModule,
     MensagemModule,
     ConversaModule,
-    AnexoModule
+    AnexoModule,
+    TipoModule,
   ],
   controllers: [],
   providers: [],
