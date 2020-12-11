@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pagination } from 'src/shared/@types';
 import { CreateMensagemDto } from 'src/shared/dtos';
+import { Anexo } from 'src/shared/entities';
 import { Mensagem } from 'src/shared/entities/mensagem.entity';
 import { Repository } from 'typeorm';
 
@@ -34,7 +35,6 @@ export class MensagemService {
         caseRemetenteSelect,
         caseAnexoSelect,
         'mensagem.texto texto',
-        'mensagem.valor valor',
         'mensagem.data_leitura data_leitura',
         'mensagem.data_envio data_envio'
       ])
@@ -123,7 +123,7 @@ export class MensagemService {
       END AS e_remetente
     `
 
-    return await this.repo.createQueryBuilder()
+    const a = await this.repo.createQueryBuilder()
       .distinct()
       .select([
         'mensagem.id id',
@@ -132,16 +132,20 @@ export class MensagemService {
         caseRemetenteSelect,
         caseAnexoSelect,
         'mensagem.texto texto',
-        'mensagem.valor valor',
-        // 'mensagem.data_anexo data_anexo',
         'mensagem.data_leitura data_leitura',
-        'mensagem.data_envio data_envio'
+        'mensagem.data_envio data_envio',
+        'array_agg((anexo.sequencia, anexo.instrucao)) anexos'
       ])
       .from(Mensagem, 'mensagem')
+      .leftJoin(Anexo, 'anexo', 'anexo.id_mensagem = mensagem.id')
       .where('mensagem.id_conversa = :id_conversa', { id_conversa })
       .orderBy('mensagem.data_envio', 'ASC')
+      .groupBy('mensagem.id_conversa, mensagem.id')
       .limit(limit)
       .offset(limit * offset)
       .getRawMany()
+
+    console.log(a);
+    return a
   }
 }

@@ -20,8 +20,8 @@ export class Mensagem {
   @Column({ type: 'text' })
   texto: string
 
-  @Column({ type: 'double precision', default: 0 })
-  valor: number
+  // @Column({ type: 'double precision', default: 0 })
+  // valor: number
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   data_leitura?: Date

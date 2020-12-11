@@ -6,6 +6,9 @@ export class Usuario {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
+  @Column({ type: 'integer', name: 'id_tipo' })
+  id_tipo: number
+
   @Column({ type: 'character varying' })
   nome: string
 

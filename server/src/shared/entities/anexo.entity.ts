@@ -11,10 +11,10 @@ export class Anexo {
   @Column({ type: 'character varying', length: 255 })
   instrucao: string
 
-  @Column({ type: 'bytea', nullable: true })
+  @Column({ type: 'bytea' })
   arquivo: Buffer
 
-  @Column({ type: 'character varying', length: 10, nullable: true })
+  @Column({ type: 'character varying', length: 10 })
   ext: string
 
   @Column({ type: 'timestamp with time zone', nullable: true })

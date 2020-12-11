@@ -8,14 +8,18 @@ export class CreateMensagemDto {
   // não é passado, pois é pegado pelo decorator
   id_remetente?: string
 
-  anexo?: string
-
   @IsNotEmpty()
   @IsString()
   texto: string
 
-  @IsNotEmpty()
-  @IsNumber()
+  anexos?: CreateAnxNaMensagem[]
+}
+
+interface CreateAnxNaMensagem {
+  instrucao: string
+  arquivo: string
+  ext: string
+  data_validade?: Date
   valor: number
 }
 
@@ -23,16 +27,14 @@ export class CreateMensagemEConversaDto {
   // não é passado, pois é pegado pelo decorator
   id_remetente?: string
 
-  anexo?: string
-
-  ext?: string
+  anexos?: CreateAnxNaMensagem[]
 
   @IsNotEmpty()
   @IsString()
   texto: string
 
-  @IsNotEmpty()
-  valor: number
+  // @IsNotEmpty()
+  // valor: number
 
   // campos relacionados a conversa
   @IsNotEmpty()
@@ -42,4 +44,8 @@ export class CreateMensagemEConversaDto {
   @IsNotEmpty()
   @IsString()
   assunto: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  id_categoria: number
 }

@@ -2,11 +2,17 @@ import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator"
 
 export class LoginDto {
   @IsNotEmpty()
-  @IsEmail()
+  @IsEmail({}, {
+    message: 'E-mail não possui um formato válido'
+  })
   email: string
 
   @IsNotEmpty()
-  @IsString()
-  @Length(8)
+  @IsString({
+    message: 'Senha precisa ter caracteres'
+  })
+  @Length(8, 64, {
+    message: 'Senha deve ter no mínimo 8 caracteres'
+  })
   senha: string
 }
