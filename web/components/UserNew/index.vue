@@ -62,7 +62,7 @@
           :rules="[
             v => !!v || 'Tipo é obrigatório',
           ]"
-          item-text="nome"
+          item-text="descricao"
           item-value="id"
           prepend-inner-icon="mdi-tag-outline"
           no-data-text="Nenhum tipo encontrado!"

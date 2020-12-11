@@ -62,7 +62,7 @@
           :rules="[
             v => !!v || 'Tipo é obrigatório',
           ]"
-          item-text="nome"
+          item-text="descricao"
           item-value="id"
           prepend-inner-icon="mdi-tag-outline"
           no-data-text="Nenhum tipo encontrado!"
@@ -100,7 +100,7 @@ import { mask } from 'vue-the-mask'
     mask
   }
 })
-export default class UserNewComponent extends Vue {
+export default class UserUpdateComponent extends Vue {
   @Prop({type: String, required: true})
   idUser!: string
 

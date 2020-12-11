@@ -15,10 +15,8 @@ export interface CreateUsuarioDto {
 export interface CreateMensagemDto {
   id_conversa: string
   id_destinatario: string
-  anexo?: string
-  ext?: string
   texto: string
-  valor: number
+  anexos: CreateAnxNaMensagem[]
 }
 
 
@@ -30,11 +28,17 @@ export interface UpdateUsuarioDto {
   id_tipo: number
 }
 
-export interface CreateMensagemEConversaDto {
-  anexo?: string
-  ext?: string
-  texto: string
+export interface CreateAnxNaMensagem {
+  instrucao: string
+  arquivo: string
+  ext: string
+  data_validade: Date
   valor: number
+}
+
+export interface CreateMensagemEConversaDto {
+  anexos: CreateAnxNaMensagem[]
+  texto: string
   id_destinatario: string[]
   assunto: string
   id_categoria: number
@@ -42,12 +46,41 @@ export interface CreateMensagemEConversaDto {
 
 export interface CategoriaDto {
   id: number
-  nome: string
+  descricao: string
   color: string
+}
+
+export interface CreateCategoriaDto {
+  descricao: string
+  cor: string
+}
+
+export interface UpdateCategoriaDto {
+  descricao: string
+  cor: string
 }
 
 export interface TipoDto {
   id: number
-  nome: string
-  color: string
+  descricao: string
+  cor: string
+}
+
+export interface CreateTipoDto {
+  descricao: string
+  cor: string
+}
+
+export interface UpdateTipoDto {
+  descricao: string
+  cor: string
+}
+
+export interface AnexosCustom {
+  instrucao: string
+  data_validade: Date
+  valor: number
+  arquivo: string
+  name_file: string
+  ext_file: string
 }

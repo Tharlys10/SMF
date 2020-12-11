@@ -39,7 +39,7 @@
           <div>
             <v-chip
               class="ma-2"
-              :color="item.tipo_cor"
+              :color="`#${item.tipo_cor}`"
               text-color="white"
             >
               {{ item.tipo }}
@@ -98,6 +98,7 @@
         :emailUser="dadosModalUpdateUSer.email"
         :contatoNomeUser="dadosModalUpdateUSer.contato_nome"
         :contatoTelefoneUser="dadosModalUpdateUSer.contato_celular"
+        :idTipoUser="dadosModalUpdateUSer.id_tipo"
         v-on:commit-close="openModalUpdateUser = false; getListaUsuarios()"
       />
     </v-dialog>

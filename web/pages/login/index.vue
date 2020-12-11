@@ -1,49 +1,55 @@
 <template>
-  <div>
+  <div style="display: flex; flex-direction: column; justify-content: center;">
     <v-row class="card-login" align="center" justify="center" >
-      <v-form class="form-login" v-model="validFormLogin">
-        <v-text-field
-          v-model="email"
-          label="E-mail"
-          outlined
-          dense
-          color="#000"
-          :rules="[
-            v => !!v || 'E-mail é obrigatório',
-            v => emailPattern.test(v) || 'Email não possui um formato válido'
-          ]"
-          prepend-inner-icon="mdi-email-multiple"
-          required
-        />
+      <v-col class="hidden-sm-only" cols="12" md="8">
+        <v-img width="50vw"  :src="require('~/assets/sing_in.svg')"></v-img>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-form v-model="validFormLogin">
+          <v-text-field
+            v-model="email"
+            label="E-mail"
+            outlined
+            dense
+            color="#000"
+            :rules="[
+              v => !!v || 'E-mail é obrigatório',
+              v => emailPattern.test(v) || 'Email não possui um formato válido'
+            ]"
+            prepend-inner-icon="mdi-email-multiple"
+            required
+          />
 
-        <v-text-field
-          v-model="senha"
-          label="Senha"
-          outlined
-          dense
-          color="#000"
-          :rules="[
-            v => !!v || 'Senha é obrigatória',
-            v => (!!v && v.length >= 8) || 'Min. 8 caracteres'
-          ]"
-          prepend-inner-icon="mdi-lock"
-          :append-icon="obscuredSenha ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="!obscuredSenha ? 'text' : 'password'"
-          @click:append="obscuredSenha = !obscuredSenha"
-          required
-          @keyup.enter="senha.length >= 8 ? sendLogin() : null"
-        />
+          <v-text-field
+            v-model="senha"
+            label="Senha"
+            outlined
+            dense
+            color="#000"
+            :rules="[
+              v => !!v || 'Senha é obrigatória',
+              v => (!!v && v.length >= 8) || 'Min. 8 caracteres'
+            ]"
+            prepend-inner-icon="mdi-lock"
+            :append-icon="obscuredSenha ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="!obscuredSenha ? 'text' : 'password'"
+            @click:append="obscuredSenha = !obscuredSenha"
+            required
+            @keyup.enter="senha.length >= 8 ? sendLogin() : null"
+          />
 
-        <v-btn
-          :disabled="!validFormLogin"
-          color="success"
-          class="mr-4"
-          @click="sendLogin"
-        >
-          Entrar
-          <v-icon right>mdi-send</v-icon>
-        </v-btn>
-      </v-form>
+          <v-btn
+            :disabled="!validFormLogin"
+            :dark="validFormLogin"
+            color="#080912"
+            class="btn-login"
+            @click="sendLogin"
+          >
+            Entrar
+            <v-icon right>mdi-login</v-icon>
+          </v-btn>
+        </v-form>
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -66,7 +72,7 @@ export default class LoginPage extends Vue {
 
   sendLogin(){
     let payload: LoginDto = {
-      email: this.email,
+      email: this.email.trim(),
       senha: this.senha
     }
 
@@ -96,7 +102,8 @@ export default class LoginPage extends Vue {
 .card-login{
   height: 95vh;
 }
-.form-login{
-  width: 35vw;
+
+.btn-login{
+  float: right;
 }
 </style>

@@ -55,7 +55,7 @@
                   <v-chip
                     small
                     class="my-1"
-                    :color="item.categoria_cor"
+                    :color="`#${item.categoria_cor}`"
                     text-color="white"
                   >
                     {{ item.categoria }}
@@ -186,13 +186,13 @@ export default class HomePage extends Vue {
 
   /* Handle */
   .card-conversas::-webkit-scrollbar-thumb {
-    background: #EFB810; 
+    background: #E26724; 
     border-radius: 10px;
   }
 
   /* Handle on hover */
   .card-conversas::-webkit-scrollbar-thumb:hover {
-    background: #D9AD26; 
+    background: #E26724; 
   }
 
   .title-card{

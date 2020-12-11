@@ -52,6 +52,26 @@
           </v-list-item-icon>
           <v-list-item-title>Usuários</v-list-item-title>
         </v-list-item>
+        <v-list-item 
+          v-if="$store.getters.isLoggedIn && $store.state.userAcessoMaster"
+          link 
+          to="/tipos/list"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-format-list-text</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Tipos</v-list-item-title>
+        </v-list-item>
+        <v-list-item 
+          v-if="$store.getters.isLoggedIn && $store.state.userAcessoMaster"
+          link 
+          to="/categorias/list"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-clipboard-list-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Categorias</v-list-item-title>
+        </v-list-item>
         <!-- <v-list-item link>
           <v-list-item-icon>
             <v-icon>mdi-account-cog-outline</v-icon>
