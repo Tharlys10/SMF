@@ -20,6 +20,8 @@ export class TipoService {
   }
 
   async list(): Promise<Tipo[]> {
-    return await this.repo.find()
+    return await this.repo.find({
+      order: { descricao: 'ASC' }
+    })
   }
 }

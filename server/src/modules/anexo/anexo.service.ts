@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LOADIPHLPAPI } from 'dns';
 import { CreateAnexoDto } from 'src/shared/dtos';
 import { Anexo } from 'src/shared/entities';
 import { Repository } from 'typeorm';
@@ -21,9 +22,14 @@ export class AnexoService {
     return !!created
   }
 
+
   async createMany(anexos: CreateAnexoDto[]): Promise<boolean> {
-    const anx = anexos.map(anexo => ({
+    const [{ coalesce }] = await this.repo
+      .query(`SELECT COALESCE(MAX(sequencia)+1, 0)::integer FROM anexo WHERE id_mensagem = '${anexos[0].id_mensagem}'`)
+
+    const anx = anexos.map((anexo, i) => ({
       ...anexo,
+      sequencia: coalesce + i + 1,
       arquivo: anexo.arquivo ? Buffer.from(anexo.arquivo.split(',')[1], 'base64') : null
     }))
 

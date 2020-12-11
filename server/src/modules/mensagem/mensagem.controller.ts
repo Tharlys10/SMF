@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, InternalServerErrorException, NotImplementedException, Param, Post, Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/shared/decorators';
-import { CreateMensagemDto, CreateMensagemEConversaDto } from 'src/shared/dtos';
+import { CreateAnexoDto, CreateMensagemDto, CreateMensagemEConversaDto } from 'src/shared/dtos';
 import { Mensagem, Usuario } from 'src/shared/entities';
 import { DefaultAuthGuard } from 'src/shared/guards';
 import { MensagemService } from './mensagem.service';
@@ -8,13 +8,15 @@ import { ConversaService } from '../conversa/conversa.service';
 import { UsuarioService } from '../usuario/usuario.service';
 import { Pagination } from 'src/shared/@types';
 import { decrypt, encrypt } from 'src/shared/functions';
+import { AnexoService } from '../anexo/anexo.service';
 
 @Controller('mensagem')
 export class MensagemController {
   constructor(
     private mensagemService: MensagemService,
     private conversaService: ConversaService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private anexoService: AnexoService
   ) {}
 
   @Post()
@@ -25,7 +27,20 @@ export class MensagemController {
   ): Promise<any> {
     mensagem.id_remetente = currentUser.id
 
-    return await this.mensagemService.create(mensagem)
+    const mensagemCriada = await this.mensagemService.create(mensagem)
+
+    const dadosAnexos = mensagem.anexos.map(anx => ({
+      id_mensagem: mensagemCriada.id,
+      instrucao: anx.instrucao,
+      arquivo: anx.arquivo,
+      ext: anx.ext,
+      data_validade: anx.data_validade || null,
+      valor: anx.valor
+    }))
+
+    await this.anexoService.createMany(dadosAnexos)
+
+    return mensagemCriada
   }
 
   @Post('conversa')
@@ -75,10 +90,19 @@ export class MensagemController {
       let mensagemCriada = await this.mensagemService.create({
         id_conversa: conversasCriadas[i],
         id_remetente: mensagem.id_remetente,
-        texto: mensagem.texto,
-        valor: mensagem.valor,
-        anexo: mensagem.anexo
+        texto: mensagem.texto
       })
+
+      const dadosAnexos: CreateAnexoDto[] = mensagem.anexos.map(anx => ({
+        id_mensagem: mensagemCriada.id,
+        instrucao: anx.instrucao,
+        arquivo: anx.arquivo,
+        ext: anx.ext,
+        data_validade: anx.data_validade || null,
+        valor: anx.valor
+      }))
+
+      await this.anexoService.createMany(dadosAnexos)
 
       mensagensCriadas.push(mensagemCriada.id)
     }

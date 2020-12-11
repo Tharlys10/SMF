@@ -1,14 +1,14 @@
-import { IsNotEmpty, IsString, Max } from "class-validator"
+import { IsNotEmpty, IsString, MaxLength } from "class-validator"
 
 export class CreateTipoDto {
   @IsNotEmpty()
   @IsString()
-  @Max(50)
+  @MaxLength(50)
   descricao: string
 
   @IsNotEmpty()
   @IsString()
-  @Max(6)
+  @MaxLength(8)
   cor: string
 }
 

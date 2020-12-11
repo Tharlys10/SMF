@@ -20,6 +20,8 @@ export class CategoriaService {
   }
 
   async list(): Promise<Categoria[]> {
-    return await this.repo.find()
+    return await this.repo.find({
+      order: { descricao: 'ASC' }
+    })
   }
 }

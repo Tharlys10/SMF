@@ -8,6 +8,6 @@ export class Tipo {
   @Column({ type: 'character varying', length: 50 })
   descricao: string
 
-  @Column({ type: 'character varying', length: 6 })
+  @Column({ type: 'character varying', length: 8 })
   cor: string
 }

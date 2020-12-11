@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID, Max } from "class-validator"
+import { IsNotEmpty, IsNumber, IsString, IsUUID, Max } from "class-validator"
 
 export class CreateAnexoDto {
   @IsNotEmpty()
@@ -19,4 +19,9 @@ export class CreateAnexoDto {
   @IsString()
   @Max(10)
   ext: string
+
+  data_validade?: Date
+
+  @IsNumber()
+  valor: number
 }
