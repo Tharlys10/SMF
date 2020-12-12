@@ -5,26 +5,35 @@
         <div
           class="title-card title-card-left"
         >
-          <v-btn
-           dark 
-           icon
-           @click="openModalNewConversa = true"
-          >
-            <v-icon>mdi-message-plus-outline</v-icon>
-          </v-btn>
+          <v-tooltip bottom color="#E26724">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                dark 
+                icon
+                v-bind="attrs"
+                v-on="on"
+                @click="openModalNewConversa = true"
+              >
+                <v-icon>mdi-message-plus-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>Nova conversa</span>
+          </v-tooltip>
           <span>CONVERSAS</span>
+
         </div>
         <div class="card-conversas">
           <v-list>
             <v-list-item  
               :class="idConversa === item.conversa_id ? 'grey lighten-1' : null"
               @click="
+                conversas[index].total_nao_lidas = 0,
                 key++,
                 idConversa = item.conversa_id, 
                 idDestinatario = item.conversa_id_usuario_primario === $store.getters.tokenData.id ? item.conversa_id_usuario_secundario : item.conversa_id_usuario_primario, 
                 userConversa = item.usuario_s_nome, 
                 assuntoConversa = item.conversa_assunto" 
-              v-for="item in conversas" 
+              v-for="(item, index) in conversas" 
               :key="item.conversa_id"
             >
               <v-list-item-avatar>
@@ -38,8 +47,28 @@
 
               <v-list-item-content>
                 <v-list-item-title>{{ item.conversa_assunto }}</v-list-item-title>
-                <v-list-item-subtitle>{{ item.usuario_s_nome }}</v-list-item-subtitle>
+                <v-list-item-subtitle>
+                  <span>
+                    {{ item.usuario_s_nome }}
+                  </span>
+                  <br />
+                  <v-chip
+                    small
+                    class="my-1"
+                    :color="`#${item.categoria_cor}`"
+                    text-color="white"
+                  >
+                    {{ item.categoria }}
+                  </v-chip>
+                </v-list-item-subtitle>
+                
               </v-list-item-content>
+              <v-list-item-action v-if="item.total_nao_lidas > 0">
+                <div class="não-lidas">
+                  
+                  {{ item.total_nao_lidas }}
+                </div>
+              </v-list-item-action>
             </v-list-item>
           </v-list>
         </div>
@@ -157,13 +186,13 @@ export default class HomePage extends Vue {
 
   /* Handle */
   .card-conversas::-webkit-scrollbar-thumb {
-    background: #EFB810; 
+    background: #E26724; 
     border-radius: 10px;
   }
 
   /* Handle on hover */
   .card-conversas::-webkit-scrollbar-thumb:hover {
-    background: #D9AD26; 
+    background: #E26724; 
   }
 
   .title-card{
@@ -180,5 +209,15 @@ export default class HomePage extends Vue {
   .title-card-right{
     border-top-right-radius: 7px;
     /* border-bottom-right-radius: 7px; */
+  }
+
+  .não-lidas{
+    width: 25px;
+    color: #FFF;
+    display: flex;
+    background-color: #228B22;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
   }
 </style>

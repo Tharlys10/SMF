@@ -70,7 +70,8 @@
           v-model="texto"
         >
           <template v-slot:append>
-            <v-btn icon @click="$refs.inputFile.click()">
+            <Anexo :anexos="anexos" />
+            <!-- <v-btn icon @click="$refs.inputFile.click()">
               <v-icon :color="anexo ? 'success' : 'secondary'" size="25">mdi-clippy</v-icon>
             </v-btn>
             <input
@@ -78,10 +79,10 @@
               type="file"
               style="display: none"
               @change="fileSelected"
-            />
-            <v-btn icon @click="openModalInsertValue = true">
+            /> -->
+            <!-- <v-btn icon @click="openModalInsertValue = true">
               <v-icon size="25" :color="valor > 0 ? 'success': 'secondary'">mdi-currency-usd-circle-outline</v-icon>
-            </v-btn>
+            </v-btn> -->
             <v-btn icon @click="sendMensagem">
               <v-icon size="25">mdi-send</v-icon>
             </v-btn>
@@ -109,7 +110,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 import { fileToBase64 } from "../../utils"
-import { CreateMensagemDto } from "@/@types"
+import { CreateMensagemDto, AnexosCustom, CreateAnxNaMensagem } from "@/@types"
 import { saveAs } from 'file-saver'
 
 @Component
@@ -122,23 +123,22 @@ export default class MessageViewerComponent extends Vue {
 
   openModalInsertValue: boolean = false
   
+  anexos: Array<AnexosCustom> = [];
+
   mensagens: Array<any> = []
 
   id_conversa: string = ''
   id_destinatario: string = ''
-  anexo: string = ''
-  ext: string = ''
   texto: string = ''
-  valor: number = 0
 
   created(){
     this.getMensagensByIDConversa()
   }
 
-  setValue(v: any) {
-    this.valor = Number(v)
-    this.openModalInsertValue = false
-  }
+  // setValue(v: any) {
+  //   this.valor = Number(v)
+  //   this.openModalInsertValue = false
+  // }
 
   getMensagensByIDConversa(){
     this.$store.dispatch('mensagem/getMensagensByIDConversa', this.idConversa)
@@ -155,39 +155,42 @@ export default class MessageViewerComponent extends Vue {
       })
   }
 
-  async fileSelected(event: any) {
-    if(!event.target.files.length) return
+  // async fileSelected(event: any) {
+  //   if(!event.target.files.length) return
 
-    const file = new File(event.target.files, event.target.files[0].name)
+  //   const file = new File(event.target.files, event.target.files[0].name)
 
-    const attachment = await fileToBase64(file)
+  //   const attachment = await fileToBase64(file)
 
-    const extension = event.target.files[0].name.split(".")
-    const ext = extension[extension.length - 1]
+  //   const extension = event.target.files[0].name.split(".")
+  //   const ext = extension[extension.length - 1]
 
-    this.anexo = attachment
-    this.ext = ext
-  }
+  //   this.anexo = attachment
+  //   this.ext = ext
+  // }
 
   sendMensagem() {
+    const anexos: CreateAnxNaMensagem[] = this.anexos.map(anx => ({
+      instrucao: anx.instrucao,
+      data_validade: new Date(anx.data_validade.toString().split('/').reverse().join('-')),
+      valor: anx.valor,
+      arquivo: anx.arquivo,
+      ext: anx.ext_file
+    }))
+
     let payload: CreateMensagemDto = {
       id_conversa: this.idConversa,
       id_destinatario: this.idDestinatario,
       texto: this.texto,
-      valor: this.valor,
-      anexo: this.anexo,
-      ext: this.ext
+      anexos
     }
 
     this.$store.dispatch('mensagem/create', payload)
       .then(res => {
         this.texto = ''
-        this.valor = 0,
-        this.anexo = ''
-        this.ext = ''
+        this.anexos = []
 
         this.mensagens.push(res.data)
-
         this.$emit('commit-recharge')
       })
       .catch((err) => {

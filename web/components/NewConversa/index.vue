@@ -28,9 +28,7 @@
               close
               @click="data.select"
               @click:close="remove(data.item)"
-            >
-              {{ data.item.nome }}
-            </v-chip>
+            >{{ data.item.nome }}</v-chip>
           </template>
           <template v-slot:item="data">
             <template v-if="typeof data.item !== 'object'">
@@ -43,6 +41,20 @@
             </template>
           </template>
         </v-autocomplete>
+        <v-select
+          v-model="id_categoria"
+          label="* Categoria"
+          :items="categorias"
+          color="#000"
+          outlined
+          dense
+          :rules="[
+            v => !!v || 'Categoria é obrigatória',
+          ]"
+          item-text="descricao"
+          item-value="id"
+          no-data-text="Nenhuma categoria encontrada!"
+        ></v-select>
         <v-text-field
           v-model="assunto"
           label="* Assunto"
@@ -53,26 +65,22 @@
             v => !!v || 'Assunto é obrigatório',
           ]"
         />
-        <v-textarea
-          color="#000"
-          outlined
-          rows="2"
-          label="* Mensagem"
-          type="text"
+        <v-textarea 
+          color="#000" 
+          outlined 
+          rows="2" 
+          label="* Mensagem" 
+          type="text" 
           v-model="texto"
         >
           <template v-slot:append>
-            <v-btn icon @click="$refs.inputFile.click()">
-              <v-icon :color="anexo ? 'success' : 'secondary'" size="25">mdi-clippy</v-icon>
-            </v-btn>
-            <input
-              ref="inputFile"
-              type="file"
-              style="display: none"
-              @change="fileSelected"
-            />
+            <Anexo :anexos="anexos" />
+
             <v-btn icon @click="openModalInsertValue = true">
-              <v-icon size="25" :color="valor > 0 ? 'success': 'secondary'">mdi-currency-usd-circle-outline</v-icon>
+              <v-icon
+                size="25"
+                :color="valor > 0 ? 'success': 'secondary'"
+              >mdi-currency-usd-circle-outline</v-icon>
             </v-btn>
           </template>
         </v-textarea>
@@ -80,31 +88,23 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn
-        color="red darken-1"
-        text
-        @click="commitClose"
-      >
-        Cancelar
-      </v-btn>
+      <v-btn color="red darken-1" text @click="commitClose">Cancelar</v-btn>
       <v-btn
         color="success darken-1"
         text
         :disabled="!validFormNewConversa"
         @click="sendConversaEMensagem"
-      >
-        Enviar
-      </v-btn>
+      >Enviar</v-btn>
     </v-card-actions>
 
-    <v-dialog 
+    <v-dialog
       v-model="openModalInsertValue"
       v-if="openModalInsertValue"
       persistent
       max-width="600px"
     >
       <InsertValue
-        v-if="openModalInsertValue" 
+        v-if="openModalInsertValue"
         :valor="valor"
         v-on:commit-close="openModalInsertValue = false"
         v-on:commit-value="setValue"
@@ -114,10 +114,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Watch, Vue } from 'nuxt-property-decorator'
-import { CreateMensagemEConversaDto } from '~/@types'
+import { Component, Watch, Vue } from "nuxt-property-decorator";
+import { CreateMensagemEConversaDto, CategoriaDto, AnexosCustom, CreateAnxNaMensagem } from "~/@types";
 import { fileToBase64 } from "../../utils";
-import { mask } from 'vue-the-mask'
+import { mask } from "vue-the-mask";
 
 @Component({
   directives: {
@@ -125,26 +125,29 @@ import { mask } from 'vue-the-mask'
   }
 })
 export default class NewConversaComponent extends Vue {
-  validFormNewConversa: boolean = false
-  openModalInsertValue: boolean = false
+  validFormNewConversa: boolean = false;
+  openModalInsertValue: boolean = false;
 
-  idDestinatario: Array<string> = []
-  texto: string = ''
-  valor: number = 0
-  assunto: string = ''
-  anexo: string = ''
-  ext: string = ''
+  idDestinatario: Array<string> = [];
+  texto: string = "";
+  valor: number = 0;
+  assunto: string = "";
+  anexos: Array<AnexosCustom> = [];
+  ext: string = "";
+
+  id_categoria: number = 0;
+  categorias: Array<CategoriaDto> = [];
 
   // Funções e variveis de controles no campo usuarios
   // No formulario de nova conversa
-  searchUsuarios: string = ""
-  usuarios: Array<any> = []
-  timeout: any = null
+  searchUsuarios: string = "";
+  usuarios: Array<any> = [];
+  timeout: any = null;
 
   @Watch("searchUsuarios")
   onSearchUsuairosChanged(_search: string) {
     if (!_search || _search.length <= 3) {
-      return
+      return;
     }
 
     clearTimeout(this.timeout);
@@ -153,76 +156,105 @@ export default class NewConversaComponent extends Vue {
       this.getUsuarios(_search);
     }, 500);
   }
-  
+
+  created() {
+    this.getCategorias();
+  }
+
   setValue(v: any) {
-    this.valor = Number(v)
-    this.openModalInsertValue = false
+    this.valor = Number(v);
+    this.openModalInsertValue = false;
   }
 
   // Buscar usuarios para preencher o campo de envio das mensagens
-  getUsuarios(nome: string){
+  getUsuarios(nome: string) {
     let params = {
       nome
-    }
+    };
 
-    this.$store.dispatch('usuario/getUsuariosByName',  params)
-      .then((res) => {
-        res.data?.map((usr: any) => {
-          const estaNosUsuariosListados = 
-            this.usuarios.some(us => usr.email === us.email)
-          
-          if (!estaNosUsuariosListados) {
-            this.usuarios.push(usr)
-          }
-        })
-      })
-      .catch((err) => {
-        this.$notify({
-          group: 'notifications',
-          type: 'error',
-          title: 'Erro ao tentar buscar os usuário',
-          text: err.response.data.message
-        });
-      })
-  }
-
-  async fileSelected(event: any) {
-    if(!event.target.files.length) return
-
-    const file = new File(event.target.files, event.target.files[0].name)
-
-    const attachment = await fileToBase64(file)
-
-    const extension = event.target.files[0].name.split(".")
-    const ext = extension[extension.length - 1]
-
-    this.anexo = attachment
-    this.ext = ext
-  }
-
-  sendConversaEMensagem(){
-    let payload: CreateMensagemEConversaDto = {
-      anexo: this.anexo,
-      ext: this.ext,
-      texto: this.texto,
-      valor: this.valor,
-      id_destinatario: this.idDestinatario,
-      assunto: this.assunto
-    }
-
-    this.$store.dispatch('mensagem/createMensagemEConverso', payload)
+    this.$store
+      .dispatch("usuario/getUsuariosByName", params)
       .then(res => {
-        console.log(res.data);
-        this.commitClose()
+        res.data?.map((usr: any) => {
+          const estaNosUsuariosListados = this.usuarios.some(
+            us => usr.email === us.email
+          );
+
+          if (!estaNosUsuariosListados) {
+            this.usuarios.push(usr);
+          }
+        });
       })
       .catch(err => {
         this.$notify({
-          group: 'notifications',
-          type: 'error',
-          title: 'Erro ao tentar criar a conversa',
+          group: "notifications",
+          type: "error",
+          title: "Erro ao tentar buscar os usuário",
           text: err.response.data.message
         });
+      });
+  }
+
+  async fileSelected(event: any) {
+    // if (!event.target.files.length) return;
+
+    // const file = new File(event.target.files, event.target.files[0].name);
+
+    // const attachment = await fileToBase64(file);
+
+    // const extension = event.target.files[0].name.split(".");
+    // const ext = extension[extension.length - 1];
+
+    // this.anexo = attachment;
+    // this.ext = ext;
+  }
+
+  sendConversaEMensagem() {
+    const anexos: CreateAnxNaMensagem[] = this.anexos.map(anx => ({
+      instrucao: anx.instrucao,
+      data_validade: new Date(anx.data_validade.toString().split('/').reverse().join('-')),
+      valor: anx.valor,
+      arquivo: anx.arquivo,
+      ext: anx.ext_file
+    }))
+
+    let payload: CreateMensagemEConversaDto = {
+      anexos,
+      texto: this.texto,
+      id_destinatario: this.idDestinatario,
+      assunto: this.assunto,
+      id_categoria: Number(this.id_categoria)
+    };
+
+    this.$store
+      .dispatch("mensagem/createMensagemEConverso", payload)
+      .then(res => {
+        this.commitClose();
       })
+      .catch(err => {
+        this.$notify({
+          group: "notifications",
+          type: "error",
+          title: "Erro ao tentar criar a conversa",
+          text: err.response.data.message
+        });
+      });
+  }
+
+  getCategorias() {
+    this.$store
+      .dispatch("categorias/getCategorias")
+      .then(res => {
+        this.categorias = res.data;
+      })
+      .catch(err => {
+        this.$notify({
+          group: "notifications",
+          type: "error",
+          title: "Erro ao tentar buscar as categorias",
+          text: err.response.data.message
+        });
+      });
   }
 
   commitClose() {
@@ -230,18 +262,15 @@ export default class NewConversaComponent extends Vue {
   }
 
   remove(item: any) {
-    const index = this.idDestinatario.indexOf(item.id)
-    if (index >= 0) this.idDestinatario.splice(index, 1)
+    const index = this.idDestinatario.indexOf(item.id);
+    if (index >= 0) this.idDestinatario.splice(index, 1);
   }
 
-
-  get usuariosToSelection(){
-    return this.usuarios
+  get usuariosToSelection() {
+    return this.usuarios;
   }
-
 }
 </script>
 
 <style>
-
 </style>

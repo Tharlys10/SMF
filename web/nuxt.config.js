@@ -3,8 +3,12 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
-    titleTemplate: '%s - web',
-    title: 'web',
+    titleTemplate: '%s - Sistema de Mensageria do Finaceiro',
+    title: 'SMF',
+    htmlAttrs: {
+      lang: 'pt-BR',
+      amp: true
+    },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -13,6 +17,11 @@ export default {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
+  },
+
+  server: {
+    port: 3001,
+    host: '0.0.0.0', // default: localhost
   },
 
   router: {
@@ -57,8 +66,8 @@ export default {
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://100.79.153.35:4000',
-    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://100.79.153.35:4000',
+    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://100.64.144.164:3369',
+    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://100.64.144.164:3369',
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)

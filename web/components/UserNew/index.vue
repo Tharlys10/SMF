@@ -52,6 +52,21 @@
           ]"
           prepend-inner-icon="mdi-cellphone-basic"
         />
+        <v-select
+          v-model="id_tipo"
+          label="* Tipo"
+          :items="tipos"
+          color="#000"
+          outlined
+          dense
+          :rules="[
+            v => !!v || 'Tipo é obrigatório',
+          ]"
+          item-text="descricao"
+          item-value="id"
+          prepend-inner-icon="mdi-tag-outline"
+          no-data-text="Nenhum tipo encontrado!"
+        ></v-select>
         <v-text-field
           v-model="senha"
           label="* Senha"
@@ -92,7 +107,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-import { CreateUsuarioDto } from '~/@types'
+import { CreateUsuarioDto, TipoDto } from '~/@types'
 import { mask } from 'vue-the-mask'
 
 @Component({
@@ -111,6 +126,13 @@ export default class UserNewComponent extends Vue {
   contatoNome: string = ''
   contatoTelefone: string = ''
   senha: string = ''
+  id_tipo: number = 0
+
+  tipos: Array<TipoDto> = []
+
+  created(){
+    this.getTipos()
+  }
 
   sendCreateUser(){
     let payload: CreateUsuarioDto = {
@@ -118,7 +140,8 @@ export default class UserNewComponent extends Vue {
       email: this.email,
       contato_nome: this.contatoNome,
       contato_celular: this.contatoTelefone.replace(/\D/g, ''),
-      senha: this.senha
+      senha: this.senha,
+      id_tipo: this.id_tipo
     }
 
     this.$store.dispatch('usuario/create', payload)
@@ -130,6 +153,21 @@ export default class UserNewComponent extends Vue {
           group: 'notifications',
           type: 'error',
           title: 'Erro ao tentar criar o usuário',
+          text: err.response.data.message
+        });
+      })
+  }
+
+  getTipos(){
+    this.$store.dispatch('tipos/getTipos')
+      .then(res => {
+        this.tipos = res.data
+      })
+      .catch(err => {
+        this.$notify({
+          group: 'notifications',
+          type: 'error',
+          title: 'Erro ao tentar buscar os tipos',
           text: err.response.data.message
         });
       })
