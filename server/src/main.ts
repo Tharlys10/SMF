@@ -1,11 +1,14 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import * as bodyParser from 'body-parser'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
   app.useGlobalPipes(new ValidationPipe())
-  app.enableCors();
-  await app.listen(process.env.APP_PORT || 3369);
+  app.use(bodyParser.json({ limit: '50mb' }))
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
+  app.enableCors()
+  await app.listen(process.env.APP_PORT || 3369)
 }
-bootstrap();
+bootstrap()

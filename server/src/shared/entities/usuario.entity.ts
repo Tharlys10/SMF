@@ -9,6 +9,9 @@ export class Usuario {
   @Column({ type: 'integer', name: 'id_tipo' })
   id_tipo: number
 
+  @Column({ type: 'bytea', nullable: true })
+  foto?: Buffer
+
   @Column({ type: 'character varying' })
   nome: string
 

@@ -16,3 +16,9 @@ export class LoginDto {
   })
   senha: string
 }
+
+export class UpdateSenhaDto {
+  id: string
+  senha_antiga: string
+  senha_nova: string
+}

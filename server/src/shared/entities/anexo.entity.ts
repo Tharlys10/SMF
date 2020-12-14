@@ -17,6 +17,9 @@ export class Anexo {
   @Column({ type: 'character varying', length: 10 })
   ext: string
 
+  @Column({ type: 'double precision', default: 0 })
+  valor: number
+
   @Column({ type: 'timestamp with time zone', nullable: true })
   data_validade?: Date
 

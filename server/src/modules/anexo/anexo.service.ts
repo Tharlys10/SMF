@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LOADIPHLPAPI } from 'dns';
 import { CreateAnexoDto } from 'src/shared/dtos';
 import { Anexo } from 'src/shared/entities';
 import { Repository } from 'typeorm';
@@ -30,7 +29,7 @@ export class AnexoService {
     const anx = anexos.map((anexo, i) => ({
       ...anexo,
       sequencia: coalesce + i + 1,
-      arquivo: anexo.arquivo ? Buffer.from(anexo.arquivo.split(',')[1], 'base64') : null
+      arquivo: anexo.arquivo ? Buffer.from(anexo.arquivo.split(',')[1], 'base64') : null,
     }))
 
     const created = await this.repo.createQueryBuilder()
@@ -44,10 +43,10 @@ export class AnexoService {
 
   async visualize(id_mensagem: string, sequencia: number, id_usuario: string): Promise<boolean> {
     const mensagem = await this.repo.query(`
-      SELECT CASE (id_remetente <> $1) THEN true ELSE false FROM mensagem WHERE id = $2
+      SELECT CASE WHEN (id_remetente <> $1) THEN true ELSE false END FROM mensagem WHERE id = $2
     `, [ id_usuario, id_mensagem ])
 
-    if (mensagem) {
+    if (mensagem[0].case) {
       const updated = await this.repo.createQueryBuilder()
         .update(Anexo)
         .set({ data_leitura: new Date() })
@@ -66,6 +65,19 @@ export class AnexoService {
     return await this.repo.findOne({
       where: { id_mensagem, sequencia }
     })
+  }
+
+  async indexWithArquivo(id_mensagem: string, sequencia: number): Promise<{ arquivo: string, ext: string, data_leitura: Date }> {
+    const { arquivo, ext, data_leitura } = await this.repo.findOne({
+      select: ['arquivo', 'ext', 'data_leitura'],
+      where: { id_mensagem, sequencia }
+    })
+
+    return {
+      arquivo: arquivo ? arquivo.toString('base64') : null,
+      ext,
+      data_leitura
+    }
   }
 
   async listByMensagem(id_mensagem: string): Promise<Anexo[]> {

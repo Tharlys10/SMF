@@ -29,18 +29,25 @@ export class MensagemController {
 
     const mensagemCriada = await this.mensagemService.create(mensagem)
 
-    const dadosAnexos = mensagem.anexos.map(anx => ({
-      id_mensagem: mensagemCriada.id,
-      instrucao: anx.instrucao,
-      arquivo: anx.arquivo,
-      ext: anx.ext,
-      data_validade: anx.data_validade || null,
-      valor: anx.valor
-    }))
+    if (mensagem.anexos.length) {
+      const dadosAnexos = mensagem.anexos.map(anx => ({
+        id_mensagem: mensagemCriada.id,
+        instrucao: anx.instrucao,
+        arquivo: anx.arquivo,
+        ext: anx.ext,
+        data_validade: anx.data_validade || null,
+        valor: anx.valor
+      }))
 
-    await this.anexoService.createMany(dadosAnexos)
+      await this.anexoService.createMany(dadosAnexos)
+    }
 
-    return mensagemCriada
+    const msg = await this.mensagemService.index(mensagemCriada.id)
+
+    return {
+      ...mensagemCriada,
+      ...msg
+    }
   }
 
   @Post('conversa')
@@ -93,16 +100,18 @@ export class MensagemController {
         texto: mensagem.texto
       })
 
-      const dadosAnexos: CreateAnexoDto[] = mensagem.anexos.map(anx => ({
-        id_mensagem: mensagemCriada.id,
-        instrucao: anx.instrucao,
-        arquivo: anx.arquivo,
-        ext: anx.ext,
-        data_validade: anx.data_validade || null,
-        valor: anx.valor
-      }))
+      if (mensagem.anexos.length) {
+        const dadosAnexos: CreateAnexoDto[] = mensagem.anexos.map(anx => ({
+          id_mensagem: mensagemCriada.id,
+          instrucao: anx.instrucao,
+          arquivo: anx.arquivo,
+          ext: anx.ext,
+          data_validade: anx.data_validade || null,
+          valor: anx.valor
+        }))
 
-      await this.anexoService.createMany(dadosAnexos)
+        await this.anexoService.createMany(dadosAnexos)
+      }
 
       mensagensCriadas.push(mensagemCriada.id)
     }
