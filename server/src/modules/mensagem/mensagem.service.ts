@@ -15,10 +15,6 @@ export class MensagemService {
   async create(mensagem: CreateMensagemDto): Promise<any> {
     const { id, id_remetente } = await this.repo.save(this.repo.create(mensagem))
 
-
-    console.log('criou');
-
-
     const caseAnexoSelect = `
       (SELECT COUNT(*) FROM anexo WHERE anexo.id_mensagem = mensagem.id)::integer anexos
     `

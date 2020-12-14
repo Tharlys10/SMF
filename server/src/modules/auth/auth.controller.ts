@@ -40,8 +40,6 @@ export class AuthController {
 
   @Put('senha')
   async changePassword(@Body() params: UpdateSenhaDto): Promise<Token> {
-    console.log(params);
-
     params.id = decrypt(params.id)
 
     const usuario = await this.usuarioService.indexByIDWithPassword(params.id)
