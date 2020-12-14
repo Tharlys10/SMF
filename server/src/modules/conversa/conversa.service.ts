@@ -60,9 +60,9 @@ export class ConversaService {
       ? 'conversa.id IS NOT NULL'
       : status == 1
         // traz todas as conversas com mensagens não lidas
-        ? `(SELECT count(*) FROM mensagem m WHERE m.id_conversa = conversa.id AND m.id_remetente <> '${id_usuario_atual}' AND data_leitura IS NULL)::integer > 0`
+        ? `(SELECT count(*) FROM mensagem m WHERE m.id_conversa = conversa.id AND m.id_remetente <> '${id_usuario_atual}' AND data_leitura IS NULL)::integer = 0`
         // traz todas as conversas sem mensagens não lidas
-        : `(SELECT count(*) FROM mensagem m WHERE m.id_conversa = conversa.id AND m.id_remetente <> '${id_usuario_atual}' AND data_leitura IS NULL)::integer = 0`
+        : `(SELECT count(*) FROM mensagem m WHERE m.id_conversa = conversa.id AND m.id_remetente <> '${id_usuario_atual}' AND data_leitura IS NULL)::integer > 0`
 
     return await this.repo.createQueryBuilder('conversa')
       .distinct()

@@ -82,27 +82,6 @@ export class MensagemService {
     return mensagem
   }
 
-  // async indexWithAnexo(id: string): Promise<{ id: string, anexo: string, ext: string }> {
-  //   const { id: idm, anexo, ext } = await this.repo.findOne({
-  //     select: ['id', 'anexo', 'ext'],
-  //     where: { id }
-  //   })
-
-  //   return { id: idm, anexo: anexo.toString('base64'), ext }
-  // }
-
-  // async viewAnexo(id: string, id_usuario: string): Promise<boolean> {
-  //   const updated = await this.repo.createQueryBuilder()
-  //     .update(Mensagem)
-  //     .set({ data_anexo: new Date() })
-  //     .where('id = :id', { id })
-  //     .andWhere('id_remetente <> :id_remetente', { id_remetente: id_usuario })
-  //     .andWhere('data_anexo IS NULL')
-  //     .execute()
-
-  //   return !!updated.affected
-  // }
-
   async viewMensagem(id_usuario: string, id_conversa: string): Promise<boolean> {
     const updated = await this.repo.createQueryBuilder()
       .update(Mensagem)

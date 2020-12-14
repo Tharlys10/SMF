@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LOADIPHLPAPI } from 'dns';
 import { CreateAnexoDto } from 'src/shared/dtos';
 import { Anexo } from 'src/shared/entities';
 import { Repository } from 'typeorm';
