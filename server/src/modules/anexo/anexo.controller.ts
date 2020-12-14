@@ -28,16 +28,16 @@ export class AnexoController {
     return await this.anexoService.createMany(anexos)
   }
 
-  @Put(':id_mensagem/:sequencia/visualizar')
+  @Get(':id_mensagem/:sequencia/visualizar')
   @UseGuards(DefaultAuthGuard)
   async visualizeAnexoByConversa(
     @Param('id_mensagem') id_mensagem: string,
     @Param('sequencia') sequencia: number,
     @CurrentUser() currentUser: Usuario
-  ): Promise<Anexo> {
+  ): Promise<{ arquivo: string, ext: string, data_leitura: Date }> {
     await this.anexoService.visualize(id_mensagem, sequencia, currentUser.id)
 
-    return await this.anexoService.index(id_mensagem, sequencia)
+    return await this.anexoService.indexWithArquivo(id_mensagem, sequencia)
   }
 
   @Get('mensagem/:id')

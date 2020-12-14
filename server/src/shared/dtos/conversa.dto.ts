@@ -15,3 +15,10 @@ export class CreateConversaDto {
   @IsNumber()
   id_categoria: number
 }
+
+export class FilterConversa {
+  assunto?: string
+  id_categoria?: number
+  id_usuario?: string
+  status?: number
+}

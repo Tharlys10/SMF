@@ -13,9 +13,11 @@ export class MensagemService {
   ) {}
 
   async create(mensagem: CreateMensagemDto): Promise<any> {
-    // const anexoBuffer = mensagem.anexo ? Buffer.from(mensagem.anexo.split(',')[1], 'base64') : null
-
     const { id, id_remetente } = await this.repo.save(this.repo.create(mensagem))
+
+
+    console.log('criou');
+
 
     const caseAnexoSelect = `
       (SELECT COUNT(*) FROM anexo WHERE anexo.id_mensagem = mensagem.id)::integer anexos
@@ -39,23 +41,10 @@ export class MensagemService {
         'mensagem.data_envio data_envio'
       ])
       .from(Mensagem, 'mensagem')
+      .leftJoin(Anexo, 'anexo', 'anexo.id_mensagem = mensagem.id')
       .where('mensagem.id = :id', { id })
       .getRawOne()
   }
-
-  // async visualizeAnexoByMensagem(id: string): Promise<Mensagem> {
-  //   const mensagem = await this.index(id)
-
-  //   if (!mensagem.data_anexo) {
-  //     await this.repo.createQueryBuilder()
-  //       .update(Mensagem)
-  //       .set({ data_anexo: new Date() })
-  //       .where('id = :id', { id })
-  //       .execute()
-  //   }
-
-  //   return mensagem
-  // }
 
   async visualizeAllByConversa(id_conversa: string): Promise<boolean> {
     const updated = await this.repo.createQueryBuilder()
@@ -69,7 +58,28 @@ export class MensagemService {
   }
 
   async index(id: string): Promise<Mensagem> {
-    return await this.repo.findOne({ id })
+    const [mensagem] = await this.repo.query(`
+      SELECT
+        mensagem.id,
+        mensagem.texto,
+        mensagem.data_leitura,
+        mensagem.data_envio,
+        COUNT(anexo.sequencia)::integer anexos,
+        CASE
+          WHEN (COUNT(anexo.*) > 0)
+          THEN
+            json_agg(
+              (SELECT row_to_json(_) FROM (SELECT anexo.sequencia, anexo.instrucao, anexo.data_validade, anexo.valor, anexo.data_leitura) as _) ORDER BY anexo.sequencia
+            )
+          ELSE '[]'::json
+        END dados_anexos
+      FROM mensagem
+      LEFT JOIN anexo ON anexo.id_mensagem = mensagem.id
+      WHERE mensagem.id = $1
+      GROUP BY mensagem.id, mensagem.texto, mensagem.data_leitura, mensagem.data_envio
+    `, [ id ])
+
+    return mensagem
   }
 
   // async indexWithAnexo(id: string): Promise<{ id: string, anexo: string, ext: string }> {
@@ -130,7 +140,7 @@ export class MensagemService {
         WHEN (COUNT(anexo.*) > 0)
         THEN
           json_agg(
-            (SELECT row_to_json(_) FROM (SELECT anexo.sequencia, anexo.instrucao) as _)
+            (SELECT row_to_json(_) FROM (SELECT anexo.sequencia, anexo.instrucao, anexo.data_validade, anexo.valor, anexo.data_leitura) as _) ORDER BY anexo.sequencia
           )
         ELSE '[]'::json
       END dados_anexos
