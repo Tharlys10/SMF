@@ -6,7 +6,8 @@ export const state = () => ({
   token: '',
   userName: '',
   userMail: '',
-  userAcessoMaster: false 
+  userAcessoMaster: false,
+  keyImg: 0
 })
 
 export type RootState = ReturnType<typeof state>

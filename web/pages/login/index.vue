@@ -18,6 +18,7 @@
             ]"
             prepend-inner-icon="mdi-email-multiple"
             required
+            @keyup.enter="validFormLogin ? sendLogin() : null"
           />
 
           <v-text-field
@@ -35,7 +36,7 @@
             :type="!obscuredSenha ? 'text' : 'password'"
             @click:append="obscuredSenha = !obscuredSenha"
             required
-            @keyup.enter="senha.length >= 8 ? sendLogin() : null"
+            @keyup.enter="validFormLogin ? sendLogin() : null"
           />
 
           <v-btn

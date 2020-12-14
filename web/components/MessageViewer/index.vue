@@ -2,103 +2,134 @@
   <div>
     <div class="messages">
       <div v-for="(item, index) in mensagens" :key="item.id">
-        <div  v-if="!item.e_remetente" class="container-chat darker">
-          <v-avatar id="avatar" color="#080912">
-            <v-icon dark>
-              mdi-account-circle
-            </v-icon>
-          </v-avatar>
-          <p v-if="item.valor > 0"> Valor: 
-            {{ Intl.NumberFormat('pt-BR', {
+        <div v-if="!item.e_remetente" class="container-chat darker">
+          <!-- <v-avatar id="avatar" color="#080912">
+            <v-icon dark>mdi-account-circle</v-icon>
+            <img :src="`http://100.64.144.174:3369/usuario/${ item.id_remetente }/foto`">
+          </v-avatar> -->
+          <p>{{ item.texto }}</p>
+          <v-tooltip color="#E26724" top v-for="anexo in item.dados_anexos" :key="anexo.sequencia">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                class="mb-2 mr-1"
+                color="success"
+                outlined
+                dark
+                small
+                v-bind="attrs"
+                v-on="on"
+                :disabled="loadingAnexoIDMensagem === item.id && loadingAnexoSequencia == anexo.sequencia"
+                @click="downloadAttachment(item.id, index, anexo.sequencia)"
+              >
+                <v-progress-circular
+                  v-if="loadingAnexoIDMensagem === item.id && loadingAnexoSequencia == anexo.sequencia"
+                  indeterminate
+                  color="#E26724"
+                  size="20"
+                ></v-progress-circular>
+                <v-icon v-else left>{{ getIcon(anexo.data_leitura) }}</v-icon>Anexo
+                <v-icon right>mdi-cloud-download-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>
+              <b>Instrução:</b>
+              {{ anexo.instrucao }}
+              <br />
+              <b>Valor:</b>
+              {{
+              Intl.NumberFormat('pt-BR', {
               currency: 'BRL',
               style: 'currency'
-            }).format(item.valor)}}
-          </p>
-          <p>{{ item.texto }}</p>
-          <v-btn 
-            v-if="item.tem_anexo"
-            class="mb-2"
-            color="success"
-            outlined 
-            dark
-            small
-            @click="downloadAttachment(item.id, index)"
-          >
-            <v-icon left>{{ getIcon(item.data_anexo) }}</v-icon> Anexo <v-icon right>mdi-cloud-download-outline</v-icon>
-          </v-btn>
-          <br/>
-          <span class="time-left">{{ formatDate(item.data_envio) }} <v-icon right>{{ getIcon(item.data_leitura) }}</v-icon></span>
+              }).format(anexo.valor)
+              }}
+              <br />
+              <b>Data de vencimento:</b>
+              {{ formatDate(anexo.data_validade, 'LL') }}
+            </span>
+          </v-tooltip>
+
+          <br />
+          <span class="time-left">
+            {{ formatDate(item.data_envio) }}
+            <v-icon right>{{ getIcon(item.data_leitura) }}</v-icon>
+          </span>
         </div>
 
-        <div v-else class="container-chat" >
-          <v-avatar id="avatar" color="#080912">
-            <v-icon dark>
-              mdi-account-circle
-            </v-icon>
-          </v-avatar>
-          <p v-if="item.valor > 0"> Valor: 
-            {{ Intl.NumberFormat('pt-BR', {
+        <div v-else class="container-chat">
+          <!-- <v-avatar id="avatar" color="#080912">
+            <img :src="`http://100.64.144.174:3369/usuario/${ item.id_remetente }/foto`">
+            <v-icon dark>mdi-account-circle</v-icon>
+          </v-avatar> -->
+          <p>{{ item.texto }}</p>
+          <v-tooltip color="#E26724" top v-for="anexo in item.dados_anexos" :key="anexo.sequencia">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                class="mb-2 mr-1"
+                color="success"
+                outlined
+                dark
+                small
+                v-bind="attrs"
+                v-on="on"
+                :disabled="loadingAnexoIDMensagem === item.id && loadingAnexoSequencia == anexo.sequencia"
+                @click="downloadAttachment(item.id, index, anexo.sequencia)"
+              >
+                <v-progress-circular
+                  v-if="loadingAnexoIDMensagem === item.id && loadingAnexoSequencia == anexo.sequencia"
+                  indeterminate
+                  color="#E26724"
+                  size="20"
+                ></v-progress-circular>
+                <v-icon v-else left>{{ getIcon(anexo.data_leitura) }}</v-icon>Anexo
+                <v-icon right>mdi-cloud-download-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>
+              <b>Instrução:</b>
+              {{ anexo.instrucao }}
+              <br />
+              <b>Valor:</b>
+              {{
+              Intl.NumberFormat('pt-BR', {
               currency: 'BRL',
               style: 'currency'
-            }).format(item.valor)}}
-          </p>
-          <p>{{ item.texto }}</p>
-          <v-btn 
-            v-if="item.tem_anexo"
-            color="success"
-            outlined 
-            dark
-            small
-            @click="downloadAttachment(item.id, index)"
-          >
-            <v-icon left>{{ getIcon(item.data_anexo) }}</v-icon> Anexo <v-icon right>mdi-cloud-download-outline</v-icon>
-          </v-btn>
-          
-          <span class="time-right">{{ formatDate(item.data_envio) }} <v-icon right>{{ getIcon(item.data_leitura) }}</v-icon></span>
+              }).format(anexo.valor)
+              }}
+              <br />
+              <b>Data de vencimento:</b>
+              {{ formatDate(anexo.data_validade, 'LL') }}
+            </span>
+          </v-tooltip>
+
+          <span class="time-right">
+            {{ formatDate(item.data_envio) }}
+            <v-icon right>{{ getIcon(item.data_leitura) }}</v-icon>
+          </span>
         </div>
       </div>
-      
     </div>
     <div class="input-message">
       <v-form>
-        <v-textarea
-          color="#000"
-          outlined
-          rows="2"
-          label="Mensagem"
-          type="text"
-          v-model="texto"
-        >
+        <v-textarea v-model="texto" color="#000" outlined rows="2" label="Mensagem" type="text">
           <template v-slot:append>
             <Anexo :anexos="anexos" />
-            <!-- <v-btn icon @click="$refs.inputFile.click()">
-              <v-icon :color="anexo ? 'success' : 'secondary'" size="25">mdi-clippy</v-icon>
-            </v-btn>
-            <input
-              ref="inputFile"
-              type="file"
-              style="display: none"
-              @change="fileSelected"
-            /> -->
-            <!-- <v-btn icon @click="openModalInsertValue = true">
-              <v-icon size="25" :color="valor > 0 ? 'success': 'secondary'">mdi-currency-usd-circle-outline</v-icon>
-            </v-btn> -->
-            <v-btn icon @click="sendMensagem">
+            <v-btn v-if="!isLoading" :disabled="!texto" icon @click="sendMensagem">
               <v-icon size="25">mdi-send</v-icon>
             </v-btn>
+            <v-progress-circular v-else indeterminate color="#E26724"></v-progress-circular>
           </template>
         </v-textarea>
       </v-form>
     </div>
 
-    <v-dialog 
+    <v-dialog
       v-model="openModalInsertValue"
       v-if="openModalInsertValue"
       persistent
       max-width="600px"
     >
       <InsertValue
-        v-if="openModalInsertValue" 
+        v-if="openModalInsertValue"
         :valor="valor"
         v-on:commit-close="openModalInsertValue = false"
         v-on:commit-value="setValue"
@@ -108,31 +139,36 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'nuxt-property-decorator'
-import { fileToBase64 } from "../../utils"
-import { CreateMensagemDto, AnexosCustom, CreateAnxNaMensagem } from "@/@types"
-import { saveAs } from 'file-saver'
+import { Component, Prop, Vue } from "nuxt-property-decorator";
+import { fileToBase64 } from "../../utils";
+import { CreateMensagemDto, AnexosCustom, CreateAnxNaMensagem } from "@/@types";
+import { saveAs } from "file-saver";
 
 @Component
 export default class MessageViewerComponent extends Vue {
-  @Prop({type: String, required: true})
+  @Prop({ type: String, required: true })
   idConversa!: string;
 
-  @Prop({type: String, required: true})
+  @Prop({ type: String, required: true })
   idDestinatario!: string;
 
-  openModalInsertValue: boolean = false
-  
+  loadingAnexoIDMensagem: string = "";
+  loadingAnexoSequencia: number = 0;
+
+  openModalInsertValue: boolean = false;
+
   anexos: Array<AnexosCustom> = [];
 
-  mensagens: Array<any> = []
+  mensagens: Array<any> = [];
 
-  id_conversa: string = ''
-  id_destinatario: string = ''
-  texto: string = ''
+  id_conversa: string = "";
+  id_destinatario: string = "";
+  texto: string = "";
 
-  created(){
-    this.getMensagensByIDConversa()
+  isLoading: boolean = false;
+
+  created() {
+    this.getMensagensByIDConversa();
   }
 
   // setValue(v: any) {
@@ -140,101 +176,107 @@ export default class MessageViewerComponent extends Vue {
   //   this.openModalInsertValue = false
   // }
 
-  getMensagensByIDConversa(){
-    this.$store.dispatch('mensagem/getMensagensByIDConversa', this.idConversa)
+  getMensagensByIDConversa() {
+    this.$store
+      .dispatch("mensagem/getMensagensByIDConversa", this.idConversa)
       .then(res => {
         this.mensagens = res.data;
       })
       .catch(err => {
         this.$notify({
-          group: 'notifications',
-          type: 'error',
-          title: 'Erro ao tentar buscar as mensagens',
+          group: "notifications",
+          type: "error",
+          title: "Erro ao tentar buscar as mensagens",
           text: err.response.data.message
         });
-      })
+      });
   }
 
-  // async fileSelected(event: any) {
-  //   if(!event.target.files.length) return
-
-  //   const file = new File(event.target.files, event.target.files[0].name)
-
-  //   const attachment = await fileToBase64(file)
-
-  //   const extension = event.target.files[0].name.split(".")
-  //   const ext = extension[extension.length - 1]
-
-  //   this.anexo = attachment
-  //   this.ext = ext
-  // }
-
   sendMensagem() {
+    this.isLoading = true;
+
     const anexos: CreateAnxNaMensagem[] = this.anexos.map(anx => ({
       instrucao: anx.instrucao,
-      data_validade: new Date(anx.data_validade.toString().split('/').reverse().join('-')),
-      valor: anx.valor,
+      data_validade: this.$moment(
+        anx.data_validade
+          .toString()
+          .split("/")
+          .reverse()
+          .join("-")
+      )
+        .add(3, "hours")
+        .toDate(),
+      valor: Number(anx.valor),
       arquivo: anx.arquivo,
       ext: anx.ext_file
-    }))
+    }));
 
     let payload: CreateMensagemDto = {
       id_conversa: this.idConversa,
       id_destinatario: this.idDestinatario,
       texto: this.texto,
       anexos
-    }
+    };
 
-    this.$store.dispatch('mensagem/create', payload)
+    this.$store
+      .dispatch("mensagem/create", payload)
       .then(res => {
-        this.texto = ''
-        this.anexos = []
+        this.texto = "";
+        this.anexos = [];
 
-        this.mensagens.push(res.data)
-        this.$emit('commit-recharge')
+        this.mensagens.push(res.data);
+        this.$emit("commit-recharge");
       })
-      .catch((err) => {
+      .catch(err => {
         this.$notify({
-          group: 'notifications',
-          type: 'error',
-          title: 'Erro ao tentar criar mensagem',
+          group: "notifications",
+          type: "error",
+          title: "Erro ao tentar criar mensagem",
           text: err.response.data.message
         });
       })
+      .finally(() => (this.isLoading = false));
   }
 
-  async downloadAttachment(id: string, index: number) {
+  async downloadAttachment(id: string, index: number, sequencia: number) {
+    this.loadingAnexoIDMensagem = id;
+    this.loadingAnexoSequencia = sequencia;
+
     const { data } = await this.$store.dispatch(
-      "mensagem/getMensagemByID",
-      id
-    )
+      "mensagem/getAnexoByIDMensagem",
+      { id, sequencia }
+    );
 
-    if (!data.anexo) return
+    if (!data.arquivo) return;
 
-    const attB64 = await fetch(`data:${data.ext};base64,${data.anexo}`)
+    const attB64 = await fetch(`data:${data.ext};base64,${data.arquivo}`);
 
-    const buf = await attB64.arrayBuffer()
+    const buf = await attB64.arrayBuffer();
 
-    const file = new File([buf], `${'download'}.${data.ext}`)
+    const file = new File([buf], `${"download"}.${data.ext}`);
 
-    saveAs(file, `${'download'}.${data.ext}`)
+    saveAs(file, `${"download"}.${data.ext}`);
 
-    if (data.atualizado) {
-      this.mensagens[index].data_anexo = new Date()
+    if (data.data_leitura != null) {
+      this.mensagens[index].dados_anexos[
+        sequencia - 1
+      ].data_leitura = new Date();
     }
 
+    this.loadingAnexoIDMensagem = "";
+    this.loadingAnexoSequencia = 0;
   }
 
-  formatDate(date: string){
-    return this.$moment(date).format('LLL')
+  formatDate(date: string, format: string = "LLL") {
+    return this.$moment(date).format(format);
   }
 
-  getIcon(data: string | null){
+  getIcon(data: string | null) {
     if (!data) {
-      return 'mdi-check'
+      return "mdi-check";
     }
 
-    return 'mdi-check-all'
+    return "mdi-check-all";
   }
 }
 </script>
@@ -249,13 +291,13 @@ export default class MessageViewerComponent extends Vue {
   border-bottom-left-radius: 7px;
 } */
 
-.messages{
+.messages {
   padding: 10px;
   height: 100%;
   overflow-y: auto;
 }
 
-.input-message{
+.input-message {
   height: 8vh;
   padding: 10px;
 }
@@ -273,7 +315,7 @@ export default class MessageViewerComponent extends Vue {
 .darker {
   border-color: #464650;
   background-color: #464650;
-  color: #FFF;
+  color: #fff;
 }
 
 /* Clear floats */
@@ -296,7 +338,7 @@ export default class MessageViewerComponent extends Vue {
 .container-chat #avatar.right {
   float: right;
   margin-left: 20px;
-  margin-right:0;
+  margin-right: 0;
 }
 
 /* Style time text */
@@ -308,7 +350,6 @@ export default class MessageViewerComponent extends Vue {
 /* Style time text */
 .time-left {
   float: left;
-  color: #FFF;
+  color: #fff;
 }
-
 </style>

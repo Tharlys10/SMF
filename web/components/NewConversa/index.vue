@@ -16,6 +16,7 @@
           outlined
           dense
           multiple
+          color="#000"
           :rules="[
             v => !!v || 'Selecione no minimo um usuário'
           ]"
@@ -66,22 +67,18 @@
           ]"
         />
         <v-textarea 
+          v-model="texto"
           color="#000" 
           outlined 
           rows="2" 
           label="* Mensagem" 
-          type="text" 
-          v-model="texto"
+          type="text"  
+          :rules="[
+            v => !!v || 'Mensagem é obrigatória',
+          ]"
         >
           <template v-slot:append>
             <Anexo :anexos="anexos" />
-
-            <v-btn icon @click="openModalInsertValue = true">
-              <v-icon
-                size="25"
-                :color="valor > 0 ? 'success': 'secondary'"
-              >mdi-currency-usd-circle-outline</v-icon>
-            </v-btn>
           </template>
         </v-textarea>
       </v-form>
@@ -90,11 +87,18 @@
       <v-spacer></v-spacer>
       <v-btn color="red darken-1" text @click="commitClose">Cancelar</v-btn>
       <v-btn
+        v-if="!isLoading"
         color="success darken-1"
         text
         :disabled="!validFormNewConversa"
         @click="sendConversaEMensagem"
       >Enviar</v-btn>
+      <v-progress-circular
+        v-else
+        indeterminate
+        color="#E26724"
+      ></v-progress-circular>
+
     </v-card-actions>
 
     <v-dialog
@@ -115,7 +119,12 @@
 
 <script lang="ts">
 import { Component, Watch, Vue } from "nuxt-property-decorator";
-import { CreateMensagemEConversaDto, CategoriaDto, AnexosCustom, CreateAnxNaMensagem } from "~/@types";
+import {
+  CreateMensagemEConversaDto,
+  CategoriaDto,
+  AnexosCustom,
+  CreateAnxNaMensagem
+} from "~/@types";
 import { fileToBase64 } from "../../utils";
 import { mask } from "vue-the-mask";
 
@@ -127,6 +136,8 @@ import { mask } from "vue-the-mask";
 export default class NewConversaComponent extends Vue {
   validFormNewConversa: boolean = false;
   openModalInsertValue: boolean = false;
+
+  isLoading: boolean = false
 
   idDestinatario: Array<string> = [];
   texto: string = "";
@@ -197,26 +208,28 @@ export default class NewConversaComponent extends Vue {
 
   async fileSelected(event: any) {
     // if (!event.target.files.length) return;
-
     // const file = new File(event.target.files, event.target.files[0].name);
-
     // const attachment = await fileToBase64(file);
-
     // const extension = event.target.files[0].name.split(".");
     // const ext = extension[extension.length - 1];
-
     // this.anexo = attachment;
     // this.ext = ext;
   }
 
   sendConversaEMensagem() {
+    this.isLoading = true;
+
     const anexos: CreateAnxNaMensagem[] = this.anexos.map(anx => ({
       instrucao: anx.instrucao,
-      data_validade: new Date(anx.data_validade.toString().split('/').reverse().join('-')),
-      valor: anx.valor,
+      data_validade: this.$moment(anx.data_validade
+        .toString()
+        .split("/")
+        .reverse()
+        .join("-")).add(3, "hours").toDate(),
+      valor: Number(anx.valor),
       arquivo: anx.arquivo,
       ext: anx.ext_file
-    }))
+    }));
 
     let payload: CreateMensagemEConversaDto = {
       anexos,
@@ -238,7 +251,8 @@ export default class NewConversaComponent extends Vue {
           title: "Erro ao tentar criar a conversa",
           text: err.response.data.message
         });
-      });
+      })
+      .finally(() => this.isLoading = false)
   }
 
   getCategorias() {

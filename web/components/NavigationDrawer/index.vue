@@ -9,10 +9,7 @@
       <v-list>
         <v-list-item class="px-2">
           <v-list-item-avatar>
-            <v-icon size="35">
-              mdi-account-circle
-            </v-icon>
-            <!-- <v-img src="https://randomuser.me/api/portraits/women/85.jpg"></v-img> -->
+            <v-img :key="$store.state.keyImg" :src="`http://100.64.144.174:3369/usuario/${$store.getters.tokenData.id}/foto`"></v-img>
           </v-list-item-avatar>
         </v-list-item>
 
@@ -72,12 +69,16 @@
           </v-list-item-icon>
           <v-list-item-title>Categorias</v-list-item-title>
         </v-list-item>
-        <!-- <v-list-item link>
+        <v-list-item 
+          v-if="$store.getters.isLoggedIn" 
+          link 
+          to="/usuarios/edit"
+        >
           <v-list-item-icon>
-            <v-icon>mdi-account-cog-outline</v-icon>
+            <v-icon>mdi-account-outline</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Configurações</v-list-item-title>
-        </v-list-item> -->
+          <v-list-item-title>Perfil</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-img>
   </v-navigation-drawer>

@@ -66,8 +66,8 @@ export default {
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://100.64.144.164:3369',
-    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://100.64.144.164:3369',
+    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://100.64.144.174:3369',
+    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://100.64.144.174:3369',
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)

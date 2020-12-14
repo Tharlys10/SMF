@@ -21,11 +21,12 @@ export const actions: ActionTree<any, RootState> = {
     })
   },
 
-  async getConversaCurrent({ rootState } ) {
+  async getConversaCurrent({ rootState }, params ) {
     return new Promise((resolve, reject) => {
       this.$axios({
         url: `/conversa/usuario/current`,
         method: 'GET',
+        params,
         headers: {
           Authorization: `Bearer ${rootState.token}`,
         },

@@ -19,6 +19,19 @@ export interface CreateMensagemDto {
   anexos: CreateAnxNaMensagem[]
 }
 
+export interface UsuarioDto {
+  id: string
+  tipo: TipoDto
+  nome: string
+  email: string
+  contato_celular: string
+}
+
+export interface UpdateSenhaDto {
+  id: string
+  senha_antiga: string
+  senha_nova: string
+}
 
 export interface UpdateUsuarioDto {
   nome?: string
