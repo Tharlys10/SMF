@@ -17,13 +17,10 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: mensagem; Type: DATABASE; Schema: -; Owner: developer
+-- Name: mensagem; Type: DATABASE; Schema: -;
 --
 
 CREATE DATABASE mensagem WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'pt_BR.UTF-8' LC_CTYPE = 'pt_BR.UTF-8';
-
-
-ALTER DATABASE mensagem OWNER TO developer;
 
 \connect mensagem
 
@@ -57,7 +54,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: anexo; Type: TABLE; Schema: public; Owner: developer
+-- Name: anexo; Type: TABLE; Schema: public;
 --
 
 CREATE TABLE public.anexo (
@@ -72,10 +69,8 @@ CREATE TABLE public.anexo (
 );
 
 
-ALTER TABLE public.anexo OWNER TO developer;
-
 --
--- Name: categoria; Type: TABLE; Schema: public; Owner: developer
+-- Name: categoria; Type: TABLE; Schema: public;
 --
 
 CREATE TABLE public.categoria (
@@ -85,10 +80,8 @@ CREATE TABLE public.categoria (
 );
 
 
-ALTER TABLE public.categoria OWNER TO developer;
-
 --
--- Name: categoria_id_seq; Type: SEQUENCE; Schema: public; Owner: developer
+-- Name: categoria_id_seq; Type: SEQUENCE; Schema: public;
 --
 
 CREATE SEQUENCE public.categoria_id_seq
@@ -99,11 +92,8 @@ CREATE SEQUENCE public.categoria_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.categoria_id_seq OWNER TO developer;
-
 --
--- Name: categoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: developer
+-- Name: categoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public;
 --
 
 ALTER SEQUENCE public.categoria_id_seq OWNED BY public.categoria.id;
@@ -140,7 +130,7 @@ COMMENT ON COLUMN public.conversa.id_usuario_secundario IS 'a quem primeiro e de
 
 
 --
--- Name: mensagem; Type: TABLE; Schema: public; Owner: developer
+-- Name: mensagem; Type: TABLE; Schema: public;
 --
 
 CREATE TABLE public.mensagem (
@@ -153,10 +143,8 @@ CREATE TABLE public.mensagem (
 );
 
 
-ALTER TABLE public.mensagem OWNER TO developer;
-
 --
--- Name: tipo; Type: TABLE; Schema: public; Owner: developer
+-- Name: tipo; Type: TABLE; Schema: public;
 --
 
 CREATE TABLE public.tipo (
@@ -166,10 +154,8 @@ CREATE TABLE public.tipo (
 );
 
 
-ALTER TABLE public.tipo OWNER TO developer;
-
 --
--- Name: tipo_id_seq; Type: SEQUENCE; Schema: public; Owner: developer
+-- Name: tipo_id_seq; Type: SEQUENCE; Schema: public;
 --
 
 CREATE SEQUENCE public.tipo_id_seq
@@ -181,10 +167,8 @@ CREATE SEQUENCE public.tipo_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tipo_id_seq OWNER TO developer;
-
 --
--- Name: tipo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: developer
+-- Name: tipo_id_seq; Type: SEQUENCE OWNED BY; Schema: public;
 --
 
 ALTER SEQUENCE public.tipo_id_seq OWNED BY public.tipo.id;
@@ -212,21 +196,21 @@ CREATE TABLE public.usuario (
 ALTER TABLE public.usuario OWNER TO comfin;
 
 --
--- Name: categoria id; Type: DEFAULT; Schema: public; Owner: developer
+-- Name: categoria id; Type: DEFAULT; Schema: public;
 --
 
 ALTER TABLE ONLY public.categoria ALTER COLUMN id SET DEFAULT nextval('public.categoria_id_seq'::regclass);
 
 
 --
--- Name: tipo id; Type: DEFAULT; Schema: public; Owner: developer
+-- Name: tipo id; Type: DEFAULT; Schema: public;
 --
 
 ALTER TABLE ONLY public.tipo ALTER COLUMN id SET DEFAULT nextval('public.tipo_id_seq'::regclass);
 
 
 --
--- Name: anexo anexo_pkey; Type: CONSTRAINT; Schema: public; Owner: developer
+-- Name: anexo anexo_pkey; Type: CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.anexo
@@ -234,7 +218,7 @@ ALTER TABLE ONLY public.anexo
 
 
 --
--- Name: categoria categoria_pkey; Type: CONSTRAINT; Schema: public; Owner: developer
+-- Name: categoria categoria_pkey; Type: CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.categoria
@@ -250,7 +234,7 @@ ALTER TABLE ONLY public.conversa
 
 
 --
--- Name: mensagem pk_msg; Type: CONSTRAINT; Schema: public; Owner: developer
+-- Name: mensagem pk_msg; Type: CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.mensagem
@@ -266,7 +250,7 @@ ALTER TABLE ONLY public.usuario
 
 
 --
--- Name: tipo tipo_pkey; Type: CONSTRAINT; Schema: public; Owner: developer
+-- Name: tipo tipo_pkey; Type: CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.tipo
@@ -274,7 +258,7 @@ ALTER TABLE ONLY public.tipo
 
 
 --
--- Name: mensagem fk_conversa; Type: FK CONSTRAINT; Schema: public; Owner: developer
+-- Name: mensagem fk_conversa; Type: FK CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.mensagem
@@ -298,7 +282,7 @@ ALTER TABLE ONLY public.conversa
 
 
 --
--- Name: mensagem fk_remetente; Type: FK CONSTRAINT; Schema: public; Owner: developer
+-- Name: mensagem fk_remetente; Type: FK CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.mensagem
