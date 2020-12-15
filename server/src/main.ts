@@ -14,7 +14,7 @@ async function bootstrap() {
   
   if (dev_state) {
     if (dev_state === '1' || dev_state === '2') {
-      app.setGlobalPrefix(process.env.GLOBAL_PREFIX || '/mensagens/server')
+      app.setGlobalPrefix(process.env.GLOBAL_PREFIX || '/msgserver')
     }
   }
 
