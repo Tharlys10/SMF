@@ -11,7 +11,7 @@ services:
       - POSTGRES_PASSWORD=ms1010aa
       - POSTGRES_DB=mensagens
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - msgdata:/var/lib/postgresql/data
     expose:
       - "5432"
     networks:
@@ -78,5 +78,5 @@ networks:
       name: proxy
 
 volumes:
-  pgdata:
-    name: pgdata
+  msgdata:
+    name: msgdata
