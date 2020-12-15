@@ -100,7 +100,7 @@ ALTER SEQUENCE public.categoria_id_seq OWNED BY public.categoria.id;
 
 
 --
--- Name: conversa; Type: TABLE; Schema: public; Owner: comfin
+-- Name: conversa; Type: TABLE; Schema: public;
 --
 
 CREATE TABLE public.conversa (
@@ -113,17 +113,15 @@ CREATE TABLE public.conversa (
 );
 
 
-ALTER TABLE public.conversa OWNER TO comfin;
-
 --
--- Name: COLUMN conversa.id_usuario_primario; Type: COMMENT; Schema: public; Owner: comfin
+-- Name: COLUMN conversa.id_usuario_primario; Type: COMMENT; Schema: public;
 --
 
 COMMENT ON COLUMN public.conversa.id_usuario_primario IS 'Quem inicia a conversa';
 
 
 --
--- Name: COLUMN conversa.id_usuario_secundario; Type: COMMENT; Schema: public; Owner: comfin
+-- Name: COLUMN conversa.id_usuario_secundario; Type: COMMENT; Schema: public;
 --
 
 COMMENT ON COLUMN public.conversa.id_usuario_secundario IS 'a quem primeiro e deistinada a conversa';
@@ -175,7 +173,7 @@ ALTER SEQUENCE public.tipo_id_seq OWNED BY public.tipo.id;
 
 
 --
--- Name: usuario; Type: TABLE; Schema: public; Owner: comfin
+-- Name: usuario; Type: TABLE; Schema: public;
 --
 
 CREATE TABLE public.usuario (
@@ -192,8 +190,6 @@ CREATE TABLE public.usuario (
     foto bytea
 );
 
-
-ALTER TABLE public.usuario OWNER TO comfin;
 
 --
 -- Name: categoria id; Type: DEFAULT; Schema: public;
@@ -226,7 +222,7 @@ ALTER TABLE ONLY public.categoria
 
 
 --
--- Name: conversa pk_conversa; Type: CONSTRAINT; Schema: public; Owner: comfin
+-- Name: conversa pk_conversa; Type: CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.conversa
@@ -242,7 +238,7 @@ ALTER TABLE ONLY public.mensagem
 
 
 --
--- Name: usuario pk_usuario; Type: CONSTRAINT; Schema: public; Owner: comfin
+-- Name: usuario pk_usuario; Type: CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.usuario
@@ -266,7 +262,7 @@ ALTER TABLE ONLY public.mensagem
 
 
 --
--- Name: conversa fk_destinario; Type: FK CONSTRAINT; Schema: public; Owner: comfin
+-- Name: conversa fk_destinario; Type: FK CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.conversa
@@ -274,7 +270,7 @@ ALTER TABLE ONLY public.conversa
 
 
 --
--- Name: conversa fk_remetente; Type: FK CONSTRAINT; Schema: public; Owner: comfin
+-- Name: conversa fk_remetente; Type: FK CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.conversa
@@ -290,7 +286,7 @@ ALTER TABLE ONLY public.mensagem
 
 
 --
--- Name: usuario usuario_id_tipo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: comfin
+-- Name: usuario usuario_id_tipo_fkey; Type: FK CONSTRAINT; Schema: public;
 --
 
 ALTER TABLE ONLY public.usuario
