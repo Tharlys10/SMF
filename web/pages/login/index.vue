@@ -71,6 +71,12 @@ export default class LoginPage extends Vue {
   email: string = ''
   senha: string = ''
 
+  created(){
+    if (this.$store.getters.isLoggedIn) {
+      this.$router.push('/')
+    }
+  }
+
   sendLogin(){
     let payload: LoginDto = {
       email: this.email.trim(),
