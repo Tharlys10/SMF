@@ -29,6 +29,7 @@ services:
       - DB_USER=messenger
       - DB_PASS=ms1010aa
       - DB_NAME=mensagens
+      - APP_PORT=4000
       - GLOBAL_PREFIX=/msgserver
       - DEV_STATE=1
     expose:
