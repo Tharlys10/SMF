@@ -9,7 +9,7 @@
       <v-list>
         <v-list-item class="px-2">
           <v-list-item-avatar>
-            <v-img :key="$store.state.keyImg" :src="`http://100.64.144.174:3369/usuario/${$store.getters.tokenData.id}/foto`"></v-img>
+            <v-img :key="$store.state.keyImg" :src="`${$store.state.url_server}/usuario/${$store.getters.tokenData.id}/foto`"></v-img>
           </v-list-item-avatar>
         </v-list-item>
 

@@ -105,7 +105,7 @@
               <v-list-item-avatar>
                 <v-avatar color="#080912">
                   <!-- <v-icon dark>mdi-account-circle</v-icon> -->
-                  <img :src="`http://100.64.144.174:3369/usuario/${ item.conversa_id_usuario_secundario }/foto`">
+                  <img :src="`${$store.state.url_server}/usuario/${ item.conversa_id_usuario_secundario }/foto`">
                 </v-avatar>
               </v-list-item-avatar>
 

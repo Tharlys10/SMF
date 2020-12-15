@@ -7,7 +7,8 @@ export const state = () => ({
   userName: '',
   userMail: '',
   userAcessoMaster: false,
-  keyImg: 0
+  keyImg: 0,
+  url_server: ''
 })
 
 export type RootState = ReturnType<typeof state>
@@ -15,6 +16,9 @@ export type RootState = ReturnType<typeof state>
 export const mutations: MutationTree<RootState> = {
   set_token: (state, token: string) => {
     state.token = token
+  },
+  set_url_server: (state, url_server: string) => {
+    state.url_server = url_server
   },
   set_user: (state, 
     {userName, userMail, userAcessoMaster}: 
@@ -84,6 +88,8 @@ export const actions: ActionTree<RootState, RootState> = {
     }
 
     commit('set_token', token)
+
+    commit('set_url_server', process.env.url_server)
     
     try {
       await dispatch('getUserCurrent');

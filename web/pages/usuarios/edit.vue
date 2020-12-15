@@ -13,7 +13,7 @@
             <v-img
               :aspect-ratio="16/9"
               @click="$refs.file.click()"
-              :src="`http://100.64.144.174:3369/usuario/${$store.getters.tokenData.id}/foto`"
+              :src="`${$store.state.url_server}/usuario/${$store.getters.tokenData.id}/foto`"
             >
               <v-expand-transition>
                 <div

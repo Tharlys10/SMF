@@ -19,6 +19,14 @@ export default {
     ]
   },
 
+  /**
+  * env
+  */
+  env: {
+    url_server: process.env.REST_ENDPOINT_CLIENT || 'http://100.64.144.174:3369'
+  },
+
+
   server: {
     port: 3001,
     host: '0.0.0.0', // default: localhost

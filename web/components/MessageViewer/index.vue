@@ -5,7 +5,7 @@
         <div v-if="!item.e_remetente" class="container-chat darker">
           <!-- <v-avatar id="avatar" color="#080912">
             <v-icon dark>mdi-account-circle</v-icon>
-            <img :src="`http://100.64.144.174:3369/usuario/${ item.id_remetente }/foto`">
+            <img :src="`${$store.state.url_server}/usuario/${ item.id_remetente }/foto`">
           </v-avatar> -->
           <p>{{ item.texto }}</p>
           <v-tooltip color="#E26724" top v-for="anexo in item.dados_anexos" :key="anexo.sequencia">
@@ -57,7 +57,7 @@
 
         <div v-else class="container-chat">
           <!-- <v-avatar id="avatar" color="#080912">
-            <img :src="`http://100.64.144.174:3369/usuario/${ item.id_remetente }/foto`">
+            <img :src="`${$store.state.url_server}/usuario/${ item.id_remetente }/foto`">
             <v-icon dark>mdi-account-circle</v-icon>
           </v-avatar> -->
           <p>{{ item.texto }}</p>
