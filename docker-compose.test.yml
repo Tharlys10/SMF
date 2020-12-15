@@ -1,0 +1,82 @@
+version: "3.7"
+
+services:
+  database:
+    build: ./database
+    image: mensagens/database
+    container_name: mensagens_database
+    restart: always
+    environment:
+      - POSTGRES_USER=messenger
+      - POSTGRES_PASSWORD=ms1010aa
+      - POSTGRES_DB=mensagens
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - mensagens
+  server:
+    build: ./server
+    image: mensagens/server
+    container_name: mensagens_server
+    restart: always
+    depends_on:
+      - database
+    environment:
+      - DB_PORT=5432
+      - DB_HOST=mensagens_database
+      - DB_USER=messenger
+      - DB_PASS=ms1010aa
+      - DB_NAME=mensagens
+      - GLOBAL_PREFIX=/mensagens/server
+      - DEV_STATE=1
+    expose:
+      - "4000"
+    networks:
+      - mensagens
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.mensagens_server.rule=Host(`t.cti.grupobrisanet.com.br`) && PathPrefix(`/mensagens/server`)"
+      - "traefik.http.routers.mensagens_server.entrypoints=websecure"
+      - "traefik.http.routers.mensagens_server.tls.certresolver=cti-ssl-resolver"
+      - "traefik.http.routers.mensagens_server.service=mensagens_server"
+      - "traefik.http.services.mensagens_server.loadbalancer.server.port=4000"
+  client:
+    build:
+      context: ./web
+      args:
+        - REST_ENDPOINT_SERVER=http://mensagens_server:4000/mensagens/server/
+        - REST_ENDPOINT_CLIENT=https://t.cti.grupobrisanet.com.br/mensagens/server/
+        - BASE_URL=/mensagens
+    image: mensagens/client
+    container_name: mensagens_client
+    restart: always
+    expose:
+      - "3000"
+    depends_on:
+      - server
+    networks:
+      - mensagens
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.mensagens_client.rule=Host(`t.cti.grupobrisanet.com.br`) && PathPrefix(`/mensagens`)"
+      - "traefik.http.routers.mensagens_client.entrypoints=websecure"
+      - "traefik.http.routers.mensagens_client.tls.certresolver=cti-ssl-resolver"
+      - "traefik.http.routers.mensagens_client.service=mensagens_client"
+      - "traefik.http.services.mensagens_client.loadbalancer.server.port=3000"
+
+networks:
+  mensagens:
+    name: mensagens-network
+  proxy:
+    external:
+      name: proxy
+
+volumes:
+  pgdata:
+    name: pgdata
