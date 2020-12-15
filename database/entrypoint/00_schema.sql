@@ -17,10 +17,11 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: mensagem; Type: DATABASE; Schema: -;
+-- Name: mensagem; Type: DATABASE; Schema: -; Owner: -
 --
 
 CREATE DATABASE mensagem WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'pt_BR.UTF-8' LC_CTYPE = 'pt_BR.UTF-8';
+
 
 \connect mensagem
 
@@ -36,25 +37,23 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: 
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
-SET default_tablespace = '';
-
 SET default_with_oids = false;
 
 --
--- Name: anexo; Type: TABLE; Schema: public;
+-- Name: anexo; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.anexo (
@@ -70,7 +69,7 @@ CREATE TABLE public.anexo (
 
 
 --
--- Name: categoria; Type: TABLE; Schema: public;
+-- Name: categoria; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.categoria (
@@ -81,7 +80,7 @@ CREATE TABLE public.categoria (
 
 
 --
--- Name: categoria_id_seq; Type: SEQUENCE; Schema: public;
+-- Name: categoria_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.categoria_id_seq
@@ -92,15 +91,16 @@ CREATE SEQUENCE public.categoria_id_seq
     NO MAXVALUE
     CACHE 1;
 
+
 --
--- Name: categoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public;
+-- Name: categoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.categoria_id_seq OWNED BY public.categoria.id;
 
 
 --
--- Name: conversa; Type: TABLE; Schema: public;
+-- Name: conversa; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.conversa (
@@ -114,21 +114,21 @@ CREATE TABLE public.conversa (
 
 
 --
--- Name: COLUMN conversa.id_usuario_primario; Type: COMMENT; Schema: public;
+-- Name: COLUMN conversa.id_usuario_primario; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.conversa.id_usuario_primario IS 'Quem inicia a conversa';
 
 
 --
--- Name: COLUMN conversa.id_usuario_secundario; Type: COMMENT; Schema: public;
+-- Name: COLUMN conversa.id_usuario_secundario; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.conversa.id_usuario_secundario IS 'a quem primeiro e deistinada a conversa';
 
 
 --
--- Name: mensagem; Type: TABLE; Schema: public;
+-- Name: mensagem; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.mensagem (
@@ -142,7 +142,7 @@ CREATE TABLE public.mensagem (
 
 
 --
--- Name: tipo; Type: TABLE; Schema: public;
+-- Name: tipo; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.tipo (
@@ -153,7 +153,7 @@ CREATE TABLE public.tipo (
 
 
 --
--- Name: tipo_id_seq; Type: SEQUENCE; Schema: public;
+-- Name: tipo_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.tipo_id_seq
@@ -166,14 +166,14 @@ CREATE SEQUENCE public.tipo_id_seq
 
 
 --
--- Name: tipo_id_seq; Type: SEQUENCE OWNED BY; Schema: public;
+-- Name: tipo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.tipo_id_seq OWNED BY public.tipo.id;
 
 
 --
--- Name: usuario; Type: TABLE; Schema: public;
+-- Name: usuario; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.usuario (
@@ -192,21 +192,21 @@ CREATE TABLE public.usuario (
 
 
 --
--- Name: categoria id; Type: DEFAULT; Schema: public;
+-- Name: categoria id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.categoria ALTER COLUMN id SET DEFAULT nextval('public.categoria_id_seq'::regclass);
 
 
 --
--- Name: tipo id; Type: DEFAULT; Schema: public;
+-- Name: tipo id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tipo ALTER COLUMN id SET DEFAULT nextval('public.tipo_id_seq'::regclass);
 
 
 --
--- Name: anexo anexo_pkey; Type: CONSTRAINT; Schema: public;
+-- Name: anexo anexo_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.anexo
@@ -214,7 +214,7 @@ ALTER TABLE ONLY public.anexo
 
 
 --
--- Name: categoria categoria_pkey; Type: CONSTRAINT; Schema: public;
+-- Name: categoria categoria_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.categoria
@@ -222,7 +222,7 @@ ALTER TABLE ONLY public.categoria
 
 
 --
--- Name: conversa pk_conversa; Type: CONSTRAINT; Schema: public;
+-- Name: conversa pk_conversa; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conversa
@@ -230,7 +230,7 @@ ALTER TABLE ONLY public.conversa
 
 
 --
--- Name: mensagem pk_msg; Type: CONSTRAINT; Schema: public;
+-- Name: mensagem pk_msg; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.mensagem
@@ -238,7 +238,7 @@ ALTER TABLE ONLY public.mensagem
 
 
 --
--- Name: usuario pk_usuario; Type: CONSTRAINT; Schema: public;
+-- Name: usuario pk_usuario; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.usuario
@@ -246,7 +246,7 @@ ALTER TABLE ONLY public.usuario
 
 
 --
--- Name: tipo tipo_pkey; Type: CONSTRAINT; Schema: public;
+-- Name: tipo tipo_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tipo
@@ -254,7 +254,7 @@ ALTER TABLE ONLY public.tipo
 
 
 --
--- Name: mensagem fk_conversa; Type: FK CONSTRAINT; Schema: public;
+-- Name: mensagem fk_conversa; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.mensagem
@@ -262,7 +262,7 @@ ALTER TABLE ONLY public.mensagem
 
 
 --
--- Name: conversa fk_destinario; Type: FK CONSTRAINT; Schema: public;
+-- Name: conversa fk_destinario; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conversa
@@ -270,7 +270,7 @@ ALTER TABLE ONLY public.conversa
 
 
 --
--- Name: conversa fk_remetente; Type: FK CONSTRAINT; Schema: public;
+-- Name: conversa fk_remetente; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conversa
@@ -278,7 +278,7 @@ ALTER TABLE ONLY public.conversa
 
 
 --
--- Name: mensagem fk_remetente; Type: FK CONSTRAINT; Schema: public;
+-- Name: mensagem fk_remetente; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.mensagem
@@ -286,7 +286,7 @@ ALTER TABLE ONLY public.mensagem
 
 
 --
--- Name: usuario usuario_id_tipo_fkey; Type: FK CONSTRAINT; Schema: public;
+-- Name: usuario usuario_id_tipo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.usuario
@@ -296,10 +296,3 @@ ALTER TABLE ONLY public.usuario
 --
 -- PostgreSQL database dump complete
 --
-
-
-INSERT INTO public.tipo(descricao, cor) VALUES ('Prog', '000000');
-
-INSERT INTO public.usuario(
-	nome, email, contato_nome, contato_celular, senha, master, id_tipo)
-	VALUES ('GIOVANNY LUCAS ALVES DE OLIVEIRA', 'giovannylucas@grupobrisanet.com.br', 'GIOVANNY LUCAS', '88888888888', '$2b$10$3GxBG8rswT4mcaLQKv7IEu3MNv0X58waWsEEn/ZoCUN9mQAewLiq.', true, 1);
