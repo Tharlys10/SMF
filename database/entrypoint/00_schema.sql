@@ -296,3 +296,10 @@ ALTER TABLE ONLY public.usuario
 --
 -- PostgreSQL database dump complete
 --
+
+
+INSERT INTO public.tipo(descricao, cor) VALUES ('Prog', '000000');
+
+INSERT INTO public.usuario(
+	nome, email, contato_nome, contato_celular, senha, master, id_tipo)
+	VALUES ('GIOVANNY LUCAS ALVES DE OLIVEIRA', 'giovannylucas@grupobrisanet.com.br', 'GIOVANNY LUCAS', '88888888888', '$2b$10$3GxBG8rswT4mcaLQKv7IEu3MNv0X58waWsEEn/ZoCUN9mQAewLiq.', true, 1);

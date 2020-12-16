@@ -1,7 +1,7 @@
 import { compare, hash } from "bcrypt";
 import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-@Entity()
+@Entity({ schema: 'public' })
 export class Usuario {
   @PrimaryGeneratedColumn('uuid')
   id: string

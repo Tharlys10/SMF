@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
-@Entity()
+@Entity({ schema: 'public' })
 export class Anexo {
   @PrimaryColumn({ type: 'uuid', name: 'id_mensagem' })
   id_mensagem: string
