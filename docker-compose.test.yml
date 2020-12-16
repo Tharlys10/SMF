@@ -49,8 +49,8 @@ services:
     build:
       context: ./web
       args:
-        - REST_ENDPOINT_SERVER=http://mensagens_server:4000/msgserver/
-        - REST_ENDPOINT_CLIENT=https://t.cti.grupobrisanet.com.br/msgserver/
+        - REST_ENDPOINT_SERVER=http://mensagens_server:4000/msgserver
+        - REST_ENDPOINT_CLIENT=https://t.cti.grupobrisanet.com.br/msgserver
         - BASE_URL=/mensagens
     image: mensagens/client
     container_name: mensagens_client
