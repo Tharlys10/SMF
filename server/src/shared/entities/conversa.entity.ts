@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Usuario } from "./usuario.entity";
 
-@Entity()
+@Entity({ schema: 'public' })
 export class Conversa {
   @PrimaryGeneratedColumn('uuid')
   id: string

@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity({ schema: 'public' })
 export class Tipo {
   @PrimaryGeneratedColumn('increment')
   id: number

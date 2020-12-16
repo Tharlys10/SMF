@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity({ schema: 'public' })
 export class Mensagem {
   @PrimaryGeneratedColumn('uuid')
   id: string
