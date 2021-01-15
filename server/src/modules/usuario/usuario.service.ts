@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Usuario } from '../../shared/entities';
+import { Tipo, Usuario } from '../../shared/entities';
 import { In, Repository } from 'typeorm';
 import { CreateUsuarioDto, FilterUsuarios, UpdateUsuarioDto } from 'src/shared/dtos';
 
@@ -23,15 +23,54 @@ export class UsuarioService {
     usuario.email = usuario.email.trim()
     usuario.contato_nome = usuario.contato_nome.toUpperCase()
 
-    const usuarioAtualizado = await this.repo.update({ id }, usuario)
+    const usuarioAtualizado = await this.repo.update({ id }, {
+      ...usuario
+    })
+
+    return !!usuarioAtualizado
+  }
+
+  async updateFoto(id: string, foto: string): Promise<Boolean> {
+    const fotoBuffer = Buffer.from(foto.split(',')[1], 'base64')
+
+    const usuarioAtualizado = await this.repo.update({ id }, {
+      foto: fotoBuffer
+    })
 
     return !!usuarioAtualizado
   }
 
   // esta função não retorna senha nem dados de registro
   async indexByID(id: string): Promise<Usuario> {
+    const caseFotoSelect = `
+      CASE
+        WHEN (usuario.foto IS NOT NULL) THEN true
+        ELSE false
+      END tem_foto
+    `
+
+    return await this.repo.createQueryBuilder()
+      .select([
+        'usuario.id id',
+        'usuario.nome nome',
+        'usuario.email email',
+        'usuario.contato_nome contato_nome',
+        'usuario.contato_celular contato_celular',
+        caseFotoSelect,
+        'tipo.id id_tipo',
+        'tipo.descricao tipo',
+        'tipo.cor tipo_cor',
+      ])
+      .leftJoin(Tipo, 'tipo', 'tipo.id = usuario.id_tipo')
+      .from(Usuario, 'usuario')
+      .where('usuario.id = :id', { id })
+      .getRawOne()
+  }
+
+
+  async indexByIDWithFoto(id: string): Promise<Usuario> {
     return await this.repo.findOne({
-      select: ['id', 'nome', 'email', 'contato_nome', 'contato_celular'],
+      select: ['id', 'nome', 'email', 'contato_nome', 'contato_celular', 'foto', 'master'],
       where: { id }
     });
   }
@@ -47,8 +86,16 @@ export class UsuarioService {
     return await this.repo.findOne({ where: { email } })
   }
 
+  async updateSenha(id: string, senha_nova: string): Promise<boolean> {
+    const updated = await this.repo.update({ id }, { senha: senha_nova })
+    return !!updated.affected
+  }
+
   async indexByIDWithPassword(id: string): Promise<Usuario> {
-    return await this.repo.findOne({ where: { id } })
+    return await this.repo.findOne({
+      // select: ['id', 'nome', 'email', 'contato_nome', 'contato_celular', 'id_tipo'],
+      where: { id }
+    })
   }
 
   async list(params: FilterUsuarios): Promise<Usuario[]> {
@@ -79,9 +126,13 @@ export class UsuarioService {
         'usuario.email email',
         'usuario.contato_nome contato_nome',
         'usuario.contato_celular contato_celular',
-        'usuario.criado_em criado_em'
+        'usuario.criado_em criado_em',
+        'tipo.id id_tipo',
+        'tipo.descricao tipo',
+        'tipo.cor tipo_cor'
       ])
       .from(Usuario, 'usuario')
+      .leftJoin(Tipo, 'tipo', 'tipo.id = usuario.id_tipo')
       .where('usuario.master = false')
       .andWhere(caseWhereFilter, { busca })
       .orderBy('usuario.nome', 'ASC')
@@ -106,9 +157,12 @@ export class UsuarioService {
       .select([
         'usuario.id id',
         'usuario.nome nome',
-        'usuario.email email'
+        'usuario.email email',
+        'tipo.descricao tipo',
+        'tipo.cor tipo_cor'
       ])
       .from(Usuario, 'usuario')
+      .leftJoin(Tipo, 'tipo', 'tipo.id = usuario.id_tipo')
       .where('usuario.id <> :id', { id })
       .andWhere(caseWhereNome, { nome })
       .andWhere(caseWhereMaster)

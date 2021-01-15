@@ -4,7 +4,7 @@
     <NavigationDrawer />
     <v-main>
       <v-container fluid>
-        <notifications group="notifications" />
+        <notifications position="bottom right" class="my-1" group="notifications" />
         <nuxt />  
       </v-container>
     </v-main>

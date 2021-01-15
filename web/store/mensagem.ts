@@ -4,10 +4,10 @@ import { CreateMensagemDto, CreateMensagemEConversaDto } from '@/@types'
 
 
 export const actions: ActionTree<any, RootState> = {
-  async getMensagemByID({ rootState }, id: string) {
+  async getAnexoByIDMensagem({ rootState }, { id, sequencia } :  { id: string, sequencia: number }) {
     return new Promise((resolve, reject) => {
       this.$axios({
-        url: `/mensagem/${id}`,
+        url: `anexo/${id}/${sequencia}/visualizar`,
         method: 'GET',
         headers: {
           Authorization: `Bearer ${rootState.token}`,

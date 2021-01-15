@@ -1,3 +1,7 @@
 export * from './auth.dto'
 export * from './mensagem.dto'
+export * from './conversa.dto'
 export * from './usuario.dto'
+export * from './anexo.dto'
+export * from './tipo.dto'
+export * from './categoria.dto'

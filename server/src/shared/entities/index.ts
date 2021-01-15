@@ -1,2 +1,6 @@
 export * from './usuario.entity'
 export * from './mensagem.entity'
+export * from './conversa.entity'
+export * from './anexo.entity'
+export * from './tipo.entity'
+export * from './categoria.entity'

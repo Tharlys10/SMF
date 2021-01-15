@@ -20,9 +20,6 @@ export const RequiredAccess: Middleware = (context) => {
   if (!auth) {
     return
   }
-
-  console.log(auth.requiredAccess);
-  console.log(currentAccess);
   
 
   if (!currentAccess && auth.requiredAccess) {

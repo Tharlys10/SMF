@@ -1,10 +1,13 @@
-import { BadRequestException, Body, ConflictException, Controller, Get, InternalServerErrorException, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, ConflictException, Controller, Get, InternalServerErrorException, Param, Post, Put, Query, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
+import { readFileSync } from 'fs';
 import { CurrentUser } from 'src/shared/decorators';
 import { CreateUsuarioDto, FilterUsuarios, UpdateUsuarioDto } from 'src/shared/dtos';
 import { Usuario } from 'src/shared/entities';
 import { decrypt, encrypt } from 'src/shared/functions';
 import { DefaultAuthGuard } from 'src/shared/guards';
 import { UsuarioService } from './usuario.service';
+import { resolve } from 'path';
 
 @Controller('usuario')
 export class UsuarioController {
@@ -33,7 +36,7 @@ export class UsuarioController {
   async updateUsuario(
     @Param('id') id: string,
     @Body() usuario: UpdateUsuarioDto
-  ): Promise<Boolean> {
+  ): Promise<Usuario> {
     const idDecrypted = decrypt(id)
 
     const usuarioByEmail = await this.usuarioService.indexByEmail(usuario.email)
@@ -47,6 +50,23 @@ export class UsuarioController {
       throw new InternalServerErrorException('Erro ao atualizar o usuário!')
     }
 
+    return await this.usuarioService.indexByID(idDecrypted)
+  }
+
+  @Put(':id/foto')
+  @UseGuards(DefaultAuthGuard)
+  async updateFoto(
+    @Param('id') id: string,
+    @Body() { foto }: { foto: string }
+  ): Promise<Boolean> {
+    const idDecrypted = decrypt(id)
+
+    const usuarioAtualizado = await this.usuarioService.updateFoto(idDecrypted, foto)
+
+    if (!usuarioAtualizado) {
+      throw new InternalServerErrorException('Erro ao atualizar a foto do usuário!')
+    }
+
     return usuarioAtualizado
   }
 
@@ -57,6 +77,31 @@ export class UsuarioController {
   ): Promise<Omit<Usuario, 'id'>> {
     currentUser.id = encrypt(currentUser.id)
     return currentUser
+  }
+
+  @Get(':id/foto')
+  // @UseGuards(DefaultAuthGuard)
+  async foto(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    const idDecrypted = decrypt(id)
+    const usuario = await this.usuarioService.indexByIDWithFoto(idDecrypted)
+
+    if (usuario.foto) {
+      res.setHeader('Content-Disposition', 'inline')
+      res.writeHead(200)
+      res.write(usuario.foto, 'utf8')
+      res.end()
+    } else {
+      const defaultFile = readFileSync(resolve(__dirname, '..', '..', 'shared', 'static', 'default.png'))
+      res.setHeader('Content-Disposition', 'inline')
+      res.writeHead(200)
+      res.write(defaultFile, 'utf8')
+      res.end()
+    }
+
+    return !!usuario.foto
   }
 
   @Get('list')
@@ -91,7 +136,10 @@ export class UsuarioController {
   @UseGuards(DefaultAuthGuard)
   async indexUsuario(@Param('id') id: string): Promise<Usuario> {
     const idDecrypted = decrypt(id)
+
     const usuario = await this.usuarioService.indexByID(idDecrypted)
+
+    usuario.id = encrypt(usuario.id)
 
     if (!usuario) {
       throw new BadRequestException('Usuário não encontrado!')

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/shared/decorators';
-import { CreateConversaDto } from 'src/shared/dtos/conversa.dto';
+import { CreateConversaDto, FilterConversa } from 'src/shared/dtos/conversa.dto';
 import { Usuario } from 'src/shared/entities';
 import { DefaultAuthGuard } from 'src/shared/guards';
 import { UsuarioService } from '../usuario/usuario.service';
@@ -37,9 +37,13 @@ export class ConversaController {
   @Get('usuario/current')
   @UseGuards(DefaultAuthGuard)
   async listConversasByCurrentUser(
-    @CurrentUser() currentUser: Usuario
+    @CurrentUser() currentUser: Usuario,
+    @Query() params: FilterConversa
   ): Promise<any[]> {
-    const conversas = await this.conversaService.listByUsuario(currentUser.id)
+    const idDecrypted = params.id_usuario ? decrypt(params.id_usuario) : null
+    params.id_usuario = idDecrypted
+
+    const conversas = await this.conversaService.listByUsuario(currentUser.id, params)
 
     conversas.forEach(cnv => {
       cnv.conversa_id_usuario_primario = encrypt(cnv.conversa_id_usuario_primario)

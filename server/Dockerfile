@@ -4,6 +4,8 @@ COPY ./package.json ./
 RUN npm install
 COPY . .
 RUN npm run build
+COPY ./src/shared/static/default.png ./dist/shared/static/
+
 
 
 FROM node:14
