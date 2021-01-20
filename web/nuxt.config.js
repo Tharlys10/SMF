@@ -27,7 +27,7 @@ export default {
   * env
   */
   env: {
-    url_server: process.env.REST_ENDPOINT_CLIENT || 'http://100.64.144.174:3369'
+    url_server: process.env.REST_ENDPOINT_CLIENT || 'http://localhost:4000'
   },
 
 
@@ -78,8 +78,8 @@ export default {
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://100.64.144.174:3369',
-    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://100.64.144.174:3369',
+    baseURL: process.env.REST_ENDPOINT_SERVER || 'http://localhost:4000',
+    browserBaseURL: process.env.REST_ENDPOINT_CLIENT || 'http://localhost:4000',
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
