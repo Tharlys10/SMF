@@ -94,7 +94,10 @@ export class UsuarioController {
       res.write(usuario.foto, 'utf8')
       res.end()
     } else {
-      const defaultFile = readFileSync(resolve(__dirname, '..', '..', 'shared', 'static', 'default.png'))
+      const defaultFile = process.env.NODE_ENV === 'production' ? 
+          readFileSync(resolve(__dirname, '..', '..', 'shared', 'static', 'default.png')) : 
+          readFileSync(resolve(__dirname, '..', '..', '..', 'src', 'shared', 'static', 'default.png'))
+          
       res.setHeader('Content-Disposition', 'inline')
       res.writeHead(200)
       res.write(defaultFile, 'utf8')
