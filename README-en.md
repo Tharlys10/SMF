@@ -42,7 +42,7 @@ $ npm run dev
 - [ ] Add functionality Y
 - [ ] Format code using X pattern
 
-## Autores
+## Authors
 
 - Tharlys - [Github](https://github.com/Tharlys10/) - [Linkedin](https://www.linkedin.com/in/tharlys-alves-7aaa011ab/) - [Instagram](https://www.instagram.com/tharlys_a/)
 - Giovanny - [Github](https://github.com/GiovannyLucas) - [Linkedin](https://www.linkedin.com/in/giovanny-oliveira/) - [Twitter](https://twitter.com/giovannylucax)
