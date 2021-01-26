@@ -17,26 +17,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: mensagem; Type: DATABASE; Schema: -; Owner: -
---
-
-CREATE DATABASE mensagem WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'pt_BR.UTF-8' LC_CTYPE = 'pt_BR.UTF-8';
-
-
-\connect mensagem
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -300,6 +280,8 @@ ALTER TABLE ONLY public.usuario
 
 INSERT INTO public.tipo(descricao, cor) VALUES ('Prog', '000000');
 
+-- Senha: xakv7f7u
+
 INSERT INTO public.usuario(
 	nome, email, contato_nome, contato_celular, senha, master, id_tipo)
-	VALUES ('GIOVANNY LUCAS ALVES DE OLIVEIRA', 'giovannylucas@grupobrisanet.com.br', 'GIOVANNY LUCAS', '88888888888', '$2b$10$3GxBG8rswT4mcaLQKv7IEu3MNv0X58waWsEEn/ZoCUN9mQAewLiq.', true, 1);
+	VALUES ('GIOVANNY LUCAS ALVES DE OLIVEIRA', 'giovannylucas@grupobrisanet.com.br', 'GIOVANNY LUCAS', '88888888888', '$2a$10$gQ8oUlaWRU03gtPHmzooQOpuW8l4F/UpFx0wPze7Qrix8/.Y02T6e', true, 1);
