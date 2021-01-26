@@ -284,4 +284,4 @@ INSERT INTO public.tipo(descricao, cor) VALUES ('Prog', '000000');
 
 INSERT INTO public.usuario(
 	nome, email, contato_nome, contato_celular, senha, master, id_tipo)
-	VALUES ('GIOVANNY LUCAS ALVES DE OLIVEIRA', 'giovannylucas@grupobrisanet.com.br', 'GIOVANNY LUCAS', '88888888888', '$2a$10$gQ8oUlaWRU03gtPHmzooQOpuW8l4F/UpFx0wPze7Qrix8/.Y02T6e', true, 1);
+	VALUES ('USUARIO TESTE 01', 'mail@mail.com.br', 'GIOVANNY LUCAS', '88888888888', '$2a$10$gQ8oUlaWRU03gtPHmzooQOpuW8l4F/UpFx0wPze7Qrix8/.Y02T6e', true, 1);
